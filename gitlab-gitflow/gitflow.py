@@ -4,7 +4,7 @@
 # curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 # sudo python get-pip.py
 # sudo pip install gitpython
-# sudo pip install --upgrade python-gitlab
+# sudo pip install --upgrade python-gitlab_manager
 
 import argparse
 
@@ -32,7 +32,7 @@ def main():
     elif args.action.lower() == 'feature-finish':
         Feature().feature_finish(args)
     elif args.action.lower() == 'hotfix-start':
-        Hotfix().hotfixStart(args)
+        Hotfix().hotfix_start(args)
     elif args.action.lower() == 'hotfix-finish':
         Hotfix().hotfix_finish(args)
     elif args.action.lower() == 'release-start':

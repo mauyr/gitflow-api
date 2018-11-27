@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import gitlab
+import gitlab_manager
 import os
 from utilities.git_helper import GitHelper
 

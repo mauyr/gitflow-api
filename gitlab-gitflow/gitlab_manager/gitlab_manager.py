@@ -5,7 +5,21 @@ import os
 from utilities.git_helper import GitHelper
 
 
-class MergeRequest:
+class GitlabManager:
+    global gl
+    global api_url
+    global api_key
+    global path
+
+    # FIXME: Separar em modulos - merge request, issues, projects
+    def __init__(self):
+        self.api_key = os.environ['GITLAB_KEY']
+        self.api_url = os.environ['GITLAB_URL']
+
+        self.path = os.getcwd()
+
+        self.data = []
+        self.gl = gitlab.Gitlab(self.api_url, private_token=self.api_key)
 
     def find_merge_request_by_url_and_branch(self, git_url, branch):
         project = self.find_project_by_url(git_url)
@@ -51,6 +65,20 @@ class MergeRequest:
         project = self._find_project_by_group_and_name(group, project_name)
         return project.mergerequests.get(merge_request_id)
 
+    def find_project_by_url(self, url):
+        group_name, project_name = GitHelper.extract_group_and_project_from_url(url)
+        group = self.find_group_by_name(group_name)
+
+        return self._find_project_by_group_and_name(group, project_name)
+
+    def find_group_by_name(self, group_name):
+        return self.gl.groups.get(group_name)
+
+    def _find_project_by_group_and_name(self, group, project_name):
+        projects = group.projects.list(all=True)
+        project = list(filter(lambda x: x.name == project_name, projects))[0]
+        return self.gl.projects.get(project.id)
+
     def _make_merge_request_description(self, model, description, issue_id):
         if description is not None:
             return description
@@ -66,7 +94,7 @@ class MergeRequest:
         return replaced_model
 
     def _get_merge_request_md(self, path):
-        merge_request_md_file = path + '/.gitlab/merge_request_templates/merge_request.md'
+        merge_request_md_file = path + '/.gitlab_manager/merge_request_templates/merge_request.md'
 
         if os.path.exists(merge_request_md_file):
             F = open(merge_request_md_file, 'r')

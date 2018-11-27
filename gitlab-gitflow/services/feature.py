@@ -2,7 +2,7 @@
 
 from properties import *
 
-from gitlab.gitlab import Gitlab
+from gitlab_manager.gitlab_manager import GitlabManager
 from utilities.git_helper import GitHelper
 from subprocess import check_call
 
@@ -10,7 +10,7 @@ from subprocess import check_call
 class Feature:
 
     def feature_start(self, args):
-        gitlab = Gitlab()
+        gitlab = GitlabManager()
         git = GitHelper()
 
         mvn_cmd = 'mvn -DfeatureName={} -DallowSnapshots=true -DpushFeatures=true jgitflow:feature-start'.format(
@@ -26,7 +26,7 @@ class Feature:
 
 
     def feature_finish(self, args):
-        gitlab = Gitlab()
+        gitlab = GitlabManager()
         git = GitHelper()
 
         branch = str(git.get_current_branch() if args.branch is None else args.branch)

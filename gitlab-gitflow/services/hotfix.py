@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from gitlab.gitlab import Gitlab
+from gitlab_manager.gitlab_manager import GitlabManager
 from utilities.git_helper import GitHelper
 
 from properties import *
@@ -8,8 +8,8 @@ from properties import *
 
 class Hotfix:
 
-    def hotfixStart(self, args):
-        gitlab = Gitlab()
+    def hotfix_start(self, args):
+        gitlab = GitlabManager()
         git = GitHelper()
 
         branch = HOTFIX_BRANCH.format(args.branch)
@@ -23,7 +23,7 @@ class Hotfix:
         print('Branch {} and mergeRequest {} as created'.format(branch, merge_request.iid))
 
     def hotfix_finish(self, args):
-        gitlab = Gitlab()
+        gitlab = GitlabManager()
         git = GitHelper()
 
         branch = str(git.get_current_branch() if args.branch is None else args.branch)

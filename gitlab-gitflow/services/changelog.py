@@ -2,7 +2,7 @@
 import os
 
 from utilities.git_helper import GitHelper
-from gitlab.gitlab import Gitlab
+from gitlab_manager.gitlab_manager import GitlabManager
 from project.project_manager_strategy import ProjectManagerStrategy
 from utilities.version_utils import VersionUtils, Version
 
@@ -84,7 +84,7 @@ class Changelog:
         return tag_commit
 
     def _normalize_issues(self, commits):
-        gitlab = Gitlab()
+        gitlab = GitlabManager()
         changelog_issues = ChangelogIssues()
 
         for commit in commits:
