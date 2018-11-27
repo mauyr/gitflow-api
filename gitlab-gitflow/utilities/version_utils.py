@@ -26,20 +26,20 @@ class VersionUtils:
         return new_version
 
     @staticmethod
-    def diff_version(self, version1, version2):
-        if self.extract_version(version1, Version.MAJOR) > self.extract_version(version2, Version.MAJOR):
+    def diff_version(version1, version2):
+        if VersionUtils.extract_version(version1, Version.MAJOR) > VersionUtils.extract_version(version2, Version.MAJOR):
             return 1
-        elif self.extract_version(version1, Version.MAJOR) < self.extract_version(version2, Version.MAJOR):
+        elif VersionUtils.extract_version(version1, Version.MAJOR) < VersionUtils.extract_version(version2, Version.MAJOR):
             return -1
         else:
-            if self.extract_version(version1, Version.MINOR) > self.extract_version(version2, Version.MINOR):
+            if VersionUtils.extract_version(version1, Version.MINOR) > VersionUtils.extract_version(version2, Version.MINOR):
                 return 1
-            elif self.extract_version(version1, Version.MINOR) < self.extract_version(version2, Version.MINOR):
+            elif VersionUtils.extract_version(version1, Version.MINOR) < VersionUtils.extract_version(version2, Version.MINOR):
                 return -1
             else:
-                if self.extract_version(version1, Version.PATCH) > self.extract_version(version2, Version.PATCH):
+                if VersionUtils.extract_version(version1, Version.PATCH) > VersionUtils.extract_version(version2, Version.PATCH):
                     return 1
-                elif self.extract_version(version1, Version.PATCH) < self.extract_version(version2, Version.PATCH):
+                elif VersionUtils.extract_version(version1, Version.PATCH) < VersionUtils.extract_version(version2, Version.PATCH):
                     return -1
                 else:
                     return 0

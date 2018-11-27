@@ -60,7 +60,7 @@ class GitHelper:
             raise RuntimeError('Conflict with branch {}'.format(branch))
 
     def extract_group_and_project(self):
-        GitHelper.extract_group_and_project(self.get_current_url())
+        return GitHelper.extract_group_and_project_from_url(self.get_current_url())
 
     @staticmethod
     def extract_group_and_project_from_url(git_url):
