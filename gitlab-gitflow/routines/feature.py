@@ -2,14 +2,13 @@
 
 from properties import *
 
-from gitflowLibs.GitlabHelper import GitlabHelper
-from gitflowLibs.GitHelper import GitHelper
-from subprocess import call, check_call
+from gitlab.GitlabHelper import GitlabHelper
+from utilities.git_helper import GitHelper
+from subprocess import check_call
 
 
 class Feature:
 
-    # gitlab-gitflow feature start
     def feature_start(self, args):
         gitlab = GitlabHelper()
         git = GitHelper()
@@ -21,22 +20,21 @@ class Feature:
         branch = FEATURE_BRANCH.format(args.branch)
         title = args.title if args.title is not None else branch
         issue = args.issue if args.issue is not None else 0
-        merge_request = gitlab.createMergeRequest(git.getCurrentUrl(), branch, 'WIP: ' + title, '', issue,
+        merge_request = gitlab.createMergeRequest(git.get_current_url(), branch, 'WIP: ' + title, '', issue,
                                                   STAGING_BRANCH, 'story')
         print('Branch {} and merge_request {} as created'.format(branch, merge_request.iid))
 
 
-    # gitlab-gitflow feature finish
     def feature_finish(self, args):
-        gitlabHelper = GitlabHelper()
-        gitHelper = GitHelper()
+        gitlab = GitlabHelper()
+        git = GitHelper()
 
-        branch = str(gitHelper.getCurrentBranch() if args.branch is None else args.branch)
+        branch = str(git.get_current_branch() if args.branch is None else args.branch)
 
         try:
-            gitlabHelper.validateAndCloseMergeRequest(gitHelper.getCurrentUrl(), branch)
-            gitHelper.getGit().checkout(STAGING_BRANCH)
-            gitHelper.getGit().pull()
+            gitlab.validateAndCloseMergeRequest(git.get_current_url(), branch)
+            git.get_git_cmd().checkout(STAGING_BRANCH)
+            git.get_git_cmd().pull()
 
             print('Feature {} merged on {}'.format(branch, FEATURE_BRANCH))
 

@@ -9,6 +9,8 @@ class GitlabHelper:
 	global api_key
 	global path
 
+
+	#FIXME: Separar em modulos - merge request, issues, projects
 	def __init__(self):
 		self.api_key = os.environ['GITLAB_KEY']
 		self.api_url = os.environ['GITLAB_URL']

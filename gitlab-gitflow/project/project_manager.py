@@ -2,7 +2,8 @@
 
 import abc
 
-class ProjectManagement(object):
+
+class ProjectManager(object):
     __metaclass__ = abc.ABCMeta
 
     global path
@@ -11,15 +12,15 @@ class ProjectManagement(object):
         self.path = path
 
     @abc.abstractmethod
-    def actualVersion(self):
+    def actual_version(self):
         return
 
     @abc.abstractmethod
-    def updateVersion(self, version):
+    def update_version(self, version):
         return
 
     @abc.abstractmethod
-    def updateDependenciesVersion(self):
+    def update_dependencies_version(self):
         pass
 
     @abc.abstractmethod
@@ -33,6 +34,7 @@ class ProjectManagement(object):
     @abc.abstractmethod
     def deploy(self):
         pass
+
 
 class Dependency(object):
     groupId = ''

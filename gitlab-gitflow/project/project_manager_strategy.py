@@ -2,12 +2,13 @@
 
 import os
 
-from gitflowLibs.project_management.angular_project import AngularProject
-from gitflowLibs.project_management.maven_project import MavenProject
+from project.angular_project import AngularProject
+from project.maven_project import MavenProject
 
-class ProjectManagementStrategy():
 
-    def getInstance(self, path):
+class ProjectManagerStrategy:
+
+    def get_instance(self, path):
         os.chdir(path)
         if os.path.exists('pom.xml'):
             return MavenProject(path)

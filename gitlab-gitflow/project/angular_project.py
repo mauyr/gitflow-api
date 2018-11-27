@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
-from gitflowLibs.project_management.project_management import ProjectManagement
+from project.project_manager import ProjectManager
 
-class AngularProject(ProjectManagement):
+
+class AngularProject(ProjectManager):
 
     def __init__(self, path):
         super.__init__(path)
 
-    def actualVersion(self):
+    def update_dependencies_version(self):
+        pass
+
+    def actual_version(self):
         return
 
-    def updateVersion(self, version):
+    def update_version(self, version):
         return
 
     def dependencies(self):
@@ -21,4 +25,3 @@ class AngularProject(ProjectManagement):
 
     def deploy(self):
         return
-
