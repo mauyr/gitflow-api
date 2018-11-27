@@ -13,11 +13,9 @@ class Feature:
         gitlab = GitlabManager()
         git = GitHelper()
 
-        mvn_cmd = 'mvn -DfeatureName={} -DallowSnapshots=true -DpushFeatures=true jgitflow:feature-start'.format(
-            args.branch)
-        check_call([mvn_cmd], shell=True)
-
         branch = FEATURE_BRANCH.format(args.branch)
+        git.create_new_branch_from(STAGING_BRANCH, branch)
+
         title = args.title if args.title is not None else branch
         issue = args.issue if args.issue is not None else 0
         merge_request = gitlab.create_merge_request(git.get_current_url(), branch, 'WIP: ' + title, '', issue,
