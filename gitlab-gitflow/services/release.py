@@ -3,7 +3,7 @@
 import os
 from gitlab.gitlab import Gitlab
 from utilities.git_helper import GitHelper
-from routines.changelog import Changelog
+from services.changelog import Changelog
 from utilities.version_utils import VersionUtils, Version
 from project.project_manager_strategy import ProjectManagerStrategy
 from properties import *

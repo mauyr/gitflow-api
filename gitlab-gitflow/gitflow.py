@@ -8,10 +8,10 @@
 
 import argparse
 
-from routines.feature import Feature
-from routines.hotfix import Hotfix
-from routines.release import Release
-from routines.changelog import Changelog
+from services.feature import Feature
+from services.hotfix import Hotfix
+from services.release import Release
+from services.changelog import Changelog
 
 
 def main():
