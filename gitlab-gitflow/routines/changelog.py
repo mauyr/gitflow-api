@@ -2,7 +2,7 @@
 import os
 
 from utilities.git_helper import GitHelper
-from gitlab.GitlabHelper import GitlabHelper
+from gitlab.gitlab import Gitlab
 from project.project_manager_strategy import ProjectManagerStrategy
 from utilities.version_utils import VersionUtils, Version
 
@@ -38,7 +38,7 @@ class Changelog:
         else:
             tags = sorted(git.repo.tags, key=lambda x: x.commit.authored_date, reverse=True)
 
-            group_name, project_name = git.extract_group_and_project_from_url()
+            group_name, project_name = git.extract_group_and_project()
             tag_commit = self._find_last_tag(project_name, tags)
 
         print('Creating changelog from {}'.format(str(tag_commit)))
@@ -84,7 +84,7 @@ class Changelog:
         return tag_commit
 
     def _normalize_issues(self, commits):
-        gitlab = GitlabHelper()
+        gitlab = Gitlab()
         changelog_issues = ChangelogIssues()
 
         for commit in commits:
@@ -93,7 +93,7 @@ class Changelog:
 
             message = commit.message
             if message.find('See merge request') >= 0:
-                merge_request = gitlab.findMergeRequestByCommitMessage(message)
+                merge_request = gitlab.find_merge_request_by_commit_message(message)
                 if merge_request.title.find('release/') == -1:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels[0] if len(merge_request.labels) > 0 else 'others')

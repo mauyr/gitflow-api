@@ -59,14 +59,18 @@ class GitHelper:
 
             raise RuntimeError('Conflict with branch {}'.format(branch))
 
-    def extract_group_and_project_from_url(self):
-        if str(self.get_current_url()).find('http') >= 0:
-            url = self.get_current_url().split('/')
+    def extract_group_and_project(self):
+        GitHelper.extract_group_and_project(self.get_current_url())
+
+    @staticmethod
+    def extract_group_and_project_from_url(git_url):
+        if git_url.find('http') >= 0:
+            url = git_url.split('/')
             group_name = str(url[len(url) - 2])
             project_name = str(url[len(url) - 1]).replace('.git', '')
             return group_name, project_name
         else:
-            url = self.get_current_url().split('/')
+            url = git_url.split('/')
             group_name = str(url[0][url[0].rfind(':') + 1:])
             project_name = str(url[1]).replace('.git', '')
             return group_name, project_name

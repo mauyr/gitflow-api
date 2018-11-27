@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from gitlab.GitlabHelper import GitlabHelper
+from gitlab.gitlab import Gitlab
 from utilities.git_helper import GitHelper
 from routines.changelog import Changelog
 from utilities.version_utils import VersionUtils, Version
@@ -36,7 +36,7 @@ class Release:
         os.chdir(initial_path)
 
     def release_finish(self, args):
-        gitlab_helper = GitlabHelper()
+        gitlab_helper = Gitlab()
         git = GitHelper()
         path = os.getcwd()
         os.chdir(path)
@@ -48,7 +48,7 @@ class Release:
 
         # continue if dont have conflicts or merge request for release is merged
         try:
-            gitlab_helper.validateAndCloseMergeRequest(git.get_current_url(), branch)
+            gitlab_helper.validate_and_close_merge_request(git.get_current_url(), branch)
         except RuntimeWarning as ex:
             print('Release branch merged!', ex)
         except ValueError as e:
@@ -61,13 +61,13 @@ class Release:
             git.check_conflicts(MASTER_BRANCH)
         except Exception as e:
             print(e)
-            gitlab_helper.createMergeRequest(git.get_current_url(), MASTER_BRANCH,
+            gitlab_helper.create_merge_request(git.get_current_url(), MASTER_BRANCH,
                                              'Synchronization merge request {} to {}'.format(MASTER_BRANCH,
                                                                                             STAGING_BRANCH),
                                              'Don\'t remove this merge request before finish release', None,
-                                             STAGING_BRANCH, None)
-            gitlab_helper.validateMergeRequestByUrlAndBranches(git.get_current_url(), MASTER_BRANCH,
-                                                               STAGING_BRANCH)
+                                               STAGING_BRANCH, None)
+            gitlab_helper.validate_merge_request_by_url_and_branches(git.get_current_url(), MASTER_BRANCH,
+                                                                     STAGING_BRANCH)
 
         git.get_git_cmd().pull()
 
@@ -90,7 +90,7 @@ class Release:
 
         git.commit_and_push_update_message('Prepare versions to release')
 
-        group_name, project_name = git.extract_group_and_project_from_url()
+        group_name, project_name = git.extract_group_and_project()
 
         changelog = Changelog().create_changelog(MASTER_BRANCH)
 
@@ -197,9 +197,9 @@ class Release:
                     self._create_recursive_merge_request('release/' + release_version, path, url_pattern,
                                                          origin_group_name))
 
-        gitlab = GitlabHelper()
+        gitlab = Gitlab()
 
-        merge_request = gitlab.findMergeRequestByUrlAndBranch(git.get_current_url(), branch)
+        merge_request = gitlab.find_merge_request_by_url_and_branch(git.get_current_url(), branch)
         if merge_request is None:
             description = str('## Merge requests\n')
             for createdMergeRequests in merge_requests:
@@ -208,8 +208,8 @@ class Release:
             description = description + Changelog().create_changelog(branch, path=actual_path)
 
             merge_requests.append(
-                gitlab.createMergeRequest(git.get_current_url(), branch, 'Release {} - ' + branch,
-                                          description, None, MASTER_BRANCH, None))
+                gitlab.create_merge_request(git.get_current_url(), branch, 'Release {} - ' + branch,
+                                            description, None, MASTER_BRANCH, None))
 
         return merge_requests
 
