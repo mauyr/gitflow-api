@@ -13,7 +13,7 @@ test_requires = []
 
 setup(
     name="GitLab-Gitflow",
-    version="0.0.3",
+    version="0.0.1",
     description="Gitlab with Gitflow library",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
