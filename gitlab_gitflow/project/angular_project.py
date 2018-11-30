@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from project.project_manager import ProjectManager
+from gitlab_gitflow.project.project_manager import ProjectManager
 
 
 class AngularProject(ProjectManager):

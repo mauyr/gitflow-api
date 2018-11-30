@@ -13,12 +13,15 @@ test_requires = []
 
 setup(
     name="GitLab-Gitflow",
-    version="0.0.1",
+    version="0.0.8",
     description="Gitlab with Gitflow library",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
     url="https://github.com/mauyr/gitlab-gitflow",
     packages=find_packages('.'),
+    entry_points = {
+        'console_scripts': ['gitflow=gitlab_gitflow.gitflow:main'],
+    },
     license="GNU GPLv3",
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=install_requires,

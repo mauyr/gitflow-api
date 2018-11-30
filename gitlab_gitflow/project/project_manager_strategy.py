@@ -2,8 +2,8 @@
 
 import os
 
-from project.angular_project import AngularProject
-from project.maven_project import MavenProject
+from gitlab_gitflow.project.angular_project import AngularProject
+from gitlab_gitflow.project.maven_project import MavenProject
 
 
 class ProjectManagerStrategy:

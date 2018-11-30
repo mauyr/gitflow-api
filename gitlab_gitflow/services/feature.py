@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-from properties import *
 
-from gitlab_manager.gitlab_manager import GitlabManager
-from utilities.git_helper import GitHelper
-from subprocess import check_call
+from gitlab_gitflow.config.properties import *
+from gitlab_gitflow.gitlab_manager.gitlab_manager import GitlabManager
+from gitlab_gitflow.utilities.git_helper import GitHelper
 
 
 class Feature:

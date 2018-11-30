@@ -1,11 +1,4 @@
 #!/usr/bin/env python
-
-# setup
-# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-# sudo python get-pip.py
-# sudo pip install gitpython
-# sudo pip install --upgrade python-gitlab_manager
-
 import argparse
 
 from services.feature import Feature
@@ -47,7 +40,3 @@ def main():
         print(
             'Action not found [feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
             'release-finish, launch, changelog]')
-
-
-# main
-main()

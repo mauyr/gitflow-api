@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import gitlab_manager
-import os
-from utilities.git_helper import GitHelper
+from gitlab_gitflow.utilities.git_helper import GitHelper
 
 
 class Project:

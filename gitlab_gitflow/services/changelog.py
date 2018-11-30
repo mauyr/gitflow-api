@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import os
 
-from utilities.git_helper import GitHelper
-from gitlab_manager.gitlab_manager import GitlabManager
-from project.project_manager_strategy import ProjectManagerStrategy
-from utilities.version_utils import VersionUtils, Version
+from gitlab_gitflow.config.properties import *
+from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitlab_gitflow.gitlab_manager.gitlab_manager import GitlabManager
+from gitlab_gitflow.project.project_manager_strategy import ProjectManagerStrategy
+from gitlab_gitflow.utilities.version_utils import VersionUtils, Version
 
-from properties import *
 
 
 class Changelog:
