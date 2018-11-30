@@ -76,8 +76,7 @@ class Release:
 
     def launch(self):
         git = GitHelper()
-        git.get_git_cmd().checkout(MASTER_BRANCH)
-        git.get_git_cmd().pull()
+        git.checkout_and_pull(MASTER_BRANCH)
 
         path = os.getcwd()
         project_management = ProjectManagerStrategy().get_instance(path)
@@ -88,7 +87,7 @@ class Release:
         project_management.update_version(version)
         project_management.update_dependencies_version()
 
-        git.commit_and_push_update_message('Prepare versions to release')
+        git.commit_and_push_update_message(MASTER_BRANCH, version)
 
         group_name, project_name = git.extract_group_and_project()
 

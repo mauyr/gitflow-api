@@ -23,7 +23,10 @@ class MavenProject(ProjectManager):
         mvn_cmd = 'mvn versions:set -DnewVersion={}'.format(version)
         check_call(mvn_cmd, shell=True)
 
-        os.remove("pom.xml.versionsBackup")
+        try:
+            os.remove("pom.xml.versionsBackup")
+        except Exception as e:
+            pass
 
     def update_dependencies_version(self):
         mvn_cmd = 'mvn versions:use-releases -Dmessage="update from snapshot to release" scm:checkin -f {}/pom.xml'.format(

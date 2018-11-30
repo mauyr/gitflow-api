@@ -2,6 +2,7 @@
 
 import gitlab
 import os
+import re
 from utilities.git_helper import GitHelper
 
 
@@ -59,7 +60,7 @@ class GitlabManager:
 
         group_name = merge_request_code[:merge_request_code.find('/')]
         project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
-        merge_request_id = merge_request_code[merge_request_code.find('!') + 1:].replace('\n', '')
+        merge_request_id = re.search('([1-9])\w', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
 
         group = self.find_group_by_name(group_name)
         project = self._find_project_by_group_and_name(group, project_name)

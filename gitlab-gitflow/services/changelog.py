@@ -121,7 +121,7 @@ class Changelog:
         commits = []
         actual_commit = Commit()
         for logLine in log:
-            line = logLine.encode('utf-8').strip()
+            line = str(logLine.encode('utf-8').strip())
             if line.find('commit') >= 0:
                 if actual_commit.commit != '':
                     commits.append(actual_commit)

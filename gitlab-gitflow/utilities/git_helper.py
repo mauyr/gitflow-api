@@ -23,8 +23,7 @@ class GitHelper:
         return self.repo.active_branch
 
     def create_new_branch_from(self, from_branch, new_branch):
-        git_cmd = 'git checkout {}'
-        check_call(git_cmd.format(from_branch), shell=True)
+        self.checkout_and_pull(from_branch)
 
         git_cmd = 'git checkout -b {}'
         check_call(git_cmd.format(new_branch), shell=True)
@@ -32,12 +31,28 @@ class GitHelper:
         git_cmd = 'git push -u origin {}'
         check_call(git_cmd.format(new_branch), shell=True)
 
-    def commit_and_push_update_message(self, branch, version):
-        git_cmd = 'git add .'
-        check_call(git_cmd, shell=True)
+    def checkout_and_pull(self, branch):
+        try:
+            git_cmd = 'git checkout {}'
+            check_call(git_cmd.format(branch), shell=True)
 
-        git_cmd = 'git commit -m "Update to next version {}"'
-        check_call(git_cmd.format(version), shell=True)
+            git_cmd = 'git pull'
+            check_call(git_cmd.format(branch), shell=True)
+        except Exception as e:
+            pass
+
+    def commit_and_push_update_message(self, branch, version):
+        self.checkout_and_pull(branch)
+
+        try:
+            git_cmd = 'git add .'
+            check_call(git_cmd, shell=True)
+
+            git_cmd = 'git commit -m "Update to next version {}"'
+            check_call(git_cmd.format(version), shell=True)
+        except Exception as e:
+            print('Nothing to commmit. Skipping.')
+            return
 
         git_cmd = 'git push -u origin {}'
         check_call(git_cmd.format(branch), shell=True)
