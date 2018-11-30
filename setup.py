@@ -66,7 +66,6 @@ test_requires = []
 
 setup(
     name="Gitflow-GitLab",
-    cmdclass={'build_py': build_py, 'sdist': sdist},
     version="0.0.1",
     description="Gitflow with Gitlab Library",
     author="Mauyr Alexandre Pereira",
@@ -75,11 +74,9 @@ setup(
     packages=find_packages('.'),
     license="GNU License",
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    requires=['gitdb2 (>=2.0.0)'],
     install_requires=install_requires,
     test_requirements=test_requires + install_requires,
-    zip_safe=False,
-    long_description="""Gitflow with Gitlab Python is a python library used use a gitflow workflow on development enviroment using a Gitlab with backend""",
+    long_description="Gitflow with Gitlab Python is a python library used use a gitflow workflow on development enviroment using a Gitlab with backend",
     classifiers=[
         # Picked from
         #   http://pypi.python.org/pypi?:action=list_classifiers
@@ -102,6 +99,6 @@ setup(
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.7"
     ]
 )
