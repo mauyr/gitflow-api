@@ -13,9 +13,6 @@ import os
 import sys
 from os import path
 
-with open(path.join(path.dirname(__file__), 'VERSION')) as v:
-    VERSION = v.readline().strip()
-
 with open('requirements.txt') as reqs_file:
     requirements = reqs_file.read().splitlines()
 
@@ -63,48 +60,43 @@ def _stamp_version(filename):
         print("WARNING: Couldn't find version line in file %s" % filename, file=sys.stderr)
 
 
-install_requires = ['gitdb2 >= 2.0.0']
-test_requires = ['ddt>=1.1.1']
+install_requires = requirements
+test_requires = []
 # end
 
 setup(
-    name="GitflowPython",
+    name="Gitflow-GitLab",
     cmdclass={'build_py': build_py, 'sdist': sdist},
-    version=VERSION,
-    description="Python Git Library",
-    author="Sebastian Thiel, Michael Trier",
-    author_email="byronimo@gmail.com, mtrier@gmail.com",
-    url="https://github.com/gitpython-developers/GitPython",
+    version="0.0.1",
+    description="Gitflow with Gitlab Library",
+    author="Mauyr Alexandre Pereira",
+    author_email="mauyr.pereira@inovapro.com.br",
+    url="https://github.com/mauyr/gitlab-gitflow",
     packages=find_packages('.'),
-    py_modules=['git.' + f[:-3] for f in os.listdir('./git') if f.endswith('.py')],
-    package_data={'git.test': ['fixtures/*']},
-    package_dir={'git': 'git'},
-    license="BSD License",
+    license="GNU License",
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     requires=['gitdb2 (>=2.0.0)'],
     install_requires=install_requires,
     test_requirements=test_requires + install_requires,
     zip_safe=False,
-    long_description="""GitPython is a python library used to interact with Git repositories""",
+    long_description="""Gitflow with Gitlab Python is a python library used use a gitflow workflow on development enviroment using a Gitlab with backend""",
     classifiers=[
         # Picked from
         #   http://pypi.python.org/pypi?:action=list_classifiers
         # "Development Status :: 1 - Planning",
-        # "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 2 - Pre-Alpha",
         # "Development Status :: 3 - Alpha",
         # "Development Status :: 4 - Beta",
-        "Development Status :: 5 - Production/Stable",
+        # "Development Status :: 5 - Production/Stable",
         # "Development Status :: 6 - Mature",
         # "Development Status :: 7 - Inactive",
         "Environment :: Console",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
+        "License :: GNU License",
         "Operating System :: OS Independent",
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS :: MacOS X",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
