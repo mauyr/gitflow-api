@@ -7,6 +7,11 @@ from gitlab_gitflow.gitlab_manager.gitlab_manager import GitlabManager
 from gitlab_gitflow.project.project_manager_strategy import ProjectManagerStrategy
 from gitlab_gitflow.utilities.version_utils import VersionUtils, Version
 
+STORY_TYPE = 'story'
+BUG_TYPE = 'bug'
+TECHNICAL_TYPE = 'technical_debt'
+OTHER_TYPE = 'other'
+IGNORE_TYPE = 'ignore'
 
 
 class Changelog:
@@ -26,8 +31,7 @@ class Changelog:
             os.chdir(path)
 
         git = GitHelper()
-        git.get_git_cmd().checkout(branch)
-        git.get_git_cmd().pull()
+        git.checkout_and_pull(branch)
 
         if len(git.repo.tags) == 0:
             return ''
@@ -94,9 +98,9 @@ class Changelog:
             message = commit.message
             if message.find('See merge request') >= 0:
                 merge_request = gitlab.find_merge_request_by_commit_message(message)
-                if merge_request.title.find('release/') == -1:
+                if merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1:
                     issue = Issue(merge_request.title, merge_request.web_url,
-                                  merge_request.labels[0] if len(merge_request.labels) > 0 else 'others')
+                                  merge_request.labels)
                     self._add_change_log_issue(changelog_issues, issue)
 
             # ignore some commits
@@ -106,13 +110,13 @@ class Changelog:
         return changelog_issues
 
     def _add_change_log_issue(self, changelog_issues, issue):
-        if issue.issueType == 'ignore':
+        if issue.issueType == IGNORE_TYPE:
             pass
-        elif issue.issueType == 'story':
+        elif issue.issueType == STORY_TYPE:
             changelog_issues.stories.append(issue)
-        elif issue.issueType == 'bug':
+        elif issue.issueType == BUG_TYPE:
             changelog_issues.bugs.append(issue)
-        elif issue.issueType == 'technical debt':
+        elif issue.issueType == TECHNICAL_TYPE:
             changelog_issues.technicalDebts.append(issue)
         else:
             changelog_issues.others.append(issue)
@@ -177,10 +181,22 @@ class Issue:
     url = ''
     issueType = ''
 
-    def __init__(self, title, url, issueType):
-        self.title = title.encode('utf-8').strip()
-        self.url = url.encode('utf-8').strip()
-        self.issueType = issueType.encode('utf-8').strip()
+    def __init__(self, title, url, labels):
+        self.title = str(title)
+        self.url = str(url)
+        self.issueType = self._getIssueType(labels)
+
+    def _getIssueType(self, labels):
+        if len(list(filter(lambda x: str(x).find(VERSION_LABEL_PREFIX.format('')) == 0, labels))) > 0 or len(set(IGNORE_LABELS) & set(labels)) > 0:
+            return IGNORE_TYPE
+        elif len(set(FEATURE_LABELS) & set(labels)) > 0:
+            return STORY_TYPE
+        elif len(set(BUG_LABELS) & set(labels)) > 0:
+            return BUG_TYPE
+        elif len(set(TECHNICAL_DEBT_LABELS) & set(labels)) > 0:
+            return TECHNICAL_TYPE
+        else:
+            return OTHER_TYPE
 
 
 class Commit:
