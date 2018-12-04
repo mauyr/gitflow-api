@@ -9,7 +9,7 @@ class ProjectManager(object):
     global path
 
     def __init__(self, path):
-        self.path = path
+        self.path = str(path)
 
     @abc.abstractmethod
     def actual_version(self):
