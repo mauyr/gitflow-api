@@ -34,7 +34,7 @@ class PythonProject(ProjectManager):
         while i < len(lines):
             version_position = str(lines[i]).lower().find('version="')
             if version_position >= 0:
-                lines[i] = lines[i][:version_position+9] + str(version) + '"'
+                lines[i] = lines[i][:version_position+9] + str(version) + '",\n'
 
             i += 1
 
@@ -73,5 +73,5 @@ class PythonProject(ProjectManager):
     @staticmethod
     def _write_new_version(lines, version_filename):
         version_file = open(version_filename, 'w')
-        version_file.write('\n'.join(lines))
+        version_file.write(''.join(lines))
         version_file.close()
