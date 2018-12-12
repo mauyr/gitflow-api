@@ -2,7 +2,7 @@
 
 import os
 from gitlab_gitflow.config.properties import *
-from gitlab_gitflow.gitlab_manager.gitlab_manager import GitlabManager
+from api.gitlab_manager.gitlab_manager import GitlabManager
 from gitlab_gitflow.utilities.git_helper import GitHelper
 from gitlab_gitflow.services.changelog import Changelog
 from gitlab_gitflow.utilities.version_utils import VersionUtils, Version

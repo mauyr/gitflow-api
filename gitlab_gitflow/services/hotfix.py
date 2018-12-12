@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from gitlab_gitflow.config.properties import *
-from gitlab_gitflow.gitlab_manager.gitlab_manager import GitlabManager
+from api.gitlab_manager.gitlab_manager import GitlabManager
 from gitlab_gitflow.utilities.git_helper import GitHelper
 
 

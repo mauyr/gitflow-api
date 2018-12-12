@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# encoding: utf-8
 import argparse
 
 from services.feature import Feature
@@ -16,7 +17,7 @@ def main():
     parser.add_argument('--branch', help='Branch name')
     parser.add_argument('--title', help='Title description of feature or hotfix')
     parser.add_argument('--issue', help='Issue ID on GitLab')
-    parser.add_argument('--fromTag', help='Inital tag for changelog comparation')
+    parser.add_argument('--fromTag', help='Initial tag for changelog comparing')
 
     args = parser.parse_args()
 
