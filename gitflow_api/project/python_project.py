@@ -22,7 +22,7 @@ class PythonProject(ProjectManager):
 
         for line in lines:
             if str(line).lower().find('version=') >= 0:
-                version = re.search('\d\.\d\.\d', str(line))
+                version = re.search('(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)', str(line))
                 if version is None:
                     raise ValueError('Version has incorrect format')
                 return version.group(0)
