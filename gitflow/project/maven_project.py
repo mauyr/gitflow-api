@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+# encoding: utf-8
+
 from subprocess import check_call
 
-from gitlab_gitflow.project.project_manager import ProjectManager, Dependency
+from gitflow.project.project_manager import ProjectManager, Dependency
 
 from xml.etree import ElementTree
 

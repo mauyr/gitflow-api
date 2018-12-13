@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+# encoding: utf-8
+
 import os
 
-from gitlab_gitflow.config.properties import *
-from gitlab_gitflow.utilities.git_helper import GitHelper
-from api.gitlab_manager.gitlab_manager import GitlabManager
-from gitlab_gitflow.project.project_manager_strategy import ProjectManagerStrategy
-from gitlab_gitflow.utilities.version_utils import VersionUtils, Version
+from gitflow.config.properties import *
+from gitflow.utilities.git_helper import GitHelper
+from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
+from gitflow.project.project_manager_strategy import ProjectManagerStrategy
+from gitflow.utilities.version_utils import VersionUtils, Version
 
 STORY_TYPE = 'story'
 BUG_TYPE = 'bug'

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
 import os
 
-from gitlab_gitflow.api.api_strategy import ApiStrategy
-from gitlab_gitflow.config.properties import *
-from gitlab_gitflow.utilities.git_helper import GitHelper
-from gitlab_gitflow.services.changelog import Changelog
-from gitlab_gitflow.utilities.version_utils import VersionUtils, Version
-from gitlab_gitflow.project.project_manager_strategy import ProjectManagerStrategy
+from gitflow.api.api_strategy import ApiStrategy
+from gitflow.config.properties import *
+from gitflow.utilities.git_helper import GitHelper
+from gitflow.services.changelog import Changelog
+from gitflow.utilities.version_utils import VersionUtils, Version
+from gitflow.project.project_manager_strategy import ProjectManagerStrategy
 
 
 class Release:

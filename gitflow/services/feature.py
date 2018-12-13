@@ -1,9 +1,9 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
-
-from gitlab_gitflow.config.properties import *
-from api.gitlab_manager.gitlab_manager import GitlabManager
-from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitflow.config.properties import *
+from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
+from gitflow.utilities.git_helper import GitHelper
 
 
 class Feature:
@@ -20,7 +20,6 @@ class Feature:
         merge_request = gitlab.create_merge_request(git.get_current_url(), branch, 'WIP: ' + title, '', issue,
                                                     STAGING_BRANCH, 'story')
         print('Branch {} and merge_request {} as created'.format(branch, merge_request.iid))
-
 
     def feature_finish(self, args):
         gitlab = GitlabManager()

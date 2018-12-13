@@ -12,22 +12,22 @@ test_requires = []
 # end
 
 setup(
-    name="GitLab-Gitflow",
+    name="Gitflow",
     version="0.0.9",
-    description="Gitlab with Gitflow library",
+    description="Gitflow library using a API as backend",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
-    url="https://github.com/mauyr/gitlab-gitflow",
+    url="https://github.com/mauyr/gitflow",
     packages=find_packages('.'),
     entry_points = {
         'console_scripts': ['gitflow=gitflow.gitflow:main'],
     },
     license="GNU GPLv3",
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+    python_requires='>=3.0',
     install_requires=install_requires,
     test_requirements=test_requires + install_requires,
-    long_description="Gitlab with Gitflow is a python library used use a gitflow methodology on development "
-                     "enviroment using a Gitlab-API with backend",
+    long_description="Gitflow is a python library used use a gitflow methodology on development using a API like "
+                     "Gitlab or Github to execute most of process",
     classifiers=[
         # Picked from
         #   http://pypi.python.org/pypi?:action=list_classifiers
@@ -44,7 +44,6 @@ setup(
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS :: MacOS X",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",

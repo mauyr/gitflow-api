@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# encoding: utf-8
+
 import configparser
 import os
 
-from gitlab_gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
-from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
+from gitflow.utilities.git_helper import GitHelper
 
 
 class ApiStrategy:

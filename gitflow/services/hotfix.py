@@ -1,9 +1,9 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
-from gitlab_gitflow.config.properties import *
-from api.gitlab_manager.gitlab_manager import GitlabManager
-from gitlab_gitflow.utilities.git_helper import GitHelper
-
+from gitflow.config.properties import *
+from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
+from gitflow.utilities.git_helper import GitHelper
 
 
 class Hotfix:
