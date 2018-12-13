@@ -1,8 +1,8 @@
-# Gitlab-Gitflow
-Gitlab-Gitflow é uma biblioteca para que possa utilizar a metodologia Gitflow usando o o Gitlab como API.
+# Gitflow
+Gitflow é uma biblioteca para que possa utilizar a metodologia Gitflow usando o o Gitlab ou Github como API.
 
 ### Requirements
-Gitlab-Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab com acesso via de sua API via Token.
+Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab ou Github com acesso de sua API via Token.
 
 * Git (1.7.x or newer)
 * Python 2.7 to 3.7.
