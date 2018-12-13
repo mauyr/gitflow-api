@@ -4,7 +4,6 @@ import os
 
 from gitflow.api.api_strategy import ApiStrategy
 from gitflow.config.properties import *
-from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
 from gitflow.utilities.git_helper import GitHelper
 
 

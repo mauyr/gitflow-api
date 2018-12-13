@@ -3,80 +3,24 @@
 
 import os
 
+from gitflow.api.gitlab_manager.project import Project
 from gitflow.api.api_merge_request import ApiMergeRequest
 
 
 class MergeRequest(ApiMergeRequest):
+    global project_api
+
+    def __init__(self, gl, path):
+        super(ApiMergeRequest, self).__init__(gl, path)
+        self.project_api = Project(gl)
 
     def find_merge_request_by_url_and_branch(self, git_url, branch):
-        project = self.find_project_by_url(git_url)
+        project = self.project_api.find_project_by_url(git_url)
 
-        return self.find_merge_request_by_project_and_branch(project, branch)
-
-    def find_merge_request_by_project_and_branch(self, project, branch):
-        if project.mergerequests is None:
-            return None
-
-        merge_requests = project.mergerequests.list(state='opened')
-
-        filtered_merge_requests = list(filter(lambda x: str(x.source_branch) == str(branch), merge_requests))
-        if len(filtered_merge_requests) == 0:
-            return None
-        else:
-            return filtered_merge_requests[0]
-
-    def _find_merge_request_by_url_and_branches(self, git_url, branch_from, branch_to):
-        project = self.find_project_by_url(git_url)
-
-        if project.mergerequests is None:
-            return None
-
-        merge_requests = project.mergerequests.list(state='opened')
-
-        filtered_merge_requests = list(
-            filter(lambda x: str(x.source_branch) == str(branch_from) and str(x.target_branch) == str(branch_to),
-                   merge_requests))
-        if len(filtered_merge_requests) == 0:
-            return None
-        else:
-            return filtered_merge_requests[0]
-
-    def find_merge_request_by_commit_message(self, commit_message):
-        merge_request_code = commit_message[commit_message.find('See merge request ') + 18:]
-
-        group_name = merge_request_code[:merge_request_code.find('/')]
-        project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
-        merge_request_id = merge_request_code[merge_request_code.find('!') + 1:].replace('\n', '')
-
-        group = self.find_group_by_name(group_name)
-        project = self._find_project_by_group_and_name(group, project_name)
-        return project.mergerequests.get(merge_request_id)
-
-    def _make_merge_request_description(self, model, description, issue_id):
-        if description is not None:
-            return description
-
-        if model is not None:
-            replaced_model = model
-        else:
-            replaced_model = 'Closes #0'
-
-        if issue_id is not None:
-            replaced_model.replace('Closes #0', 'Closes #' + str(issue_id))
-
-        return replaced_model
-
-    def _get_merge_request_md(self, path):
-        merge_request_md_file = path + '/.gitlab_manager/merge_request_templates/merge_request.md'
-
-        if os.path.exists(merge_request_md_file):
-            F = open(merge_request_md_file, 'r')
-            return F.read()
-        else:
-            return None
+        return self._find_merge_request_by_project_and_branch(project, branch)
 
     def create_merge_request(self, git_url, branch_from, title, description, issue_id, to_branch, label):
-        project = self.find_project_by_url(git_url)
+        project = self.project_api.find_project_by_url(git_url)
 
         merge_request = self._find_merge_request_by_url_and_branches(git_url, branch_from, to_branch)
 
@@ -101,6 +45,79 @@ class MergeRequest(ApiMergeRequest):
 
         return merge_request
 
+    def validate_and_close_merge_request(self, git_url, branch):
+        mergeRequest = self.find_merge_request_by_url_and_branch(git_url, branch)
+
+        if self._validate_merge_request(mergeRequest):
+            mergeRequest.merge()
+
+    def validate_merge_request_by_url_and_branches(self, git_url, branch_from, branch_to):
+        merge_request = self._find_merge_request_by_url_and_branches(git_url, branch_from, branch_to)
+
+        return self._validate_merge_request(merge_request)
+
+    def find_merge_request_by_commit_message(self, commit_message):
+        merge_request_code = commit_message[commit_message.find('See merge request ') + 18:]
+
+        group_name = merge_request_code[:merge_request_code.find('/')]
+        project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
+        merge_request_id = merge_request_code[merge_request_code.find('!') + 1:].replace('\n', '')
+
+        group = self.project_api.find_group_by_name(group_name)
+        project = self.project_api.find_project_by_group_and_name(group, project_name)
+        return project.mergerequests.get(merge_request_id)
+
+    def _find_merge_request_by_project_and_branch(self, project, branch):
+        if project.mergerequests is None:
+            return None
+
+        merge_requests = project.mergerequests.list(state='opened')
+
+        filtered_merge_requests = list(filter(lambda x: str(x.source_branch) == str(branch), merge_requests))
+        if len(filtered_merge_requests) == 0:
+            return None
+        else:
+            return filtered_merge_requests[0]
+
+    def _find_merge_request_by_url_and_branches(self, git_url, branch_from, branch_to):
+        project = self.project_api.find_project_by_url(git_url)
+
+        if project.mergerequests is None:
+            return None
+
+        merge_requests = project.mergerequests.list(state='opened')
+
+        filtered_merge_requests = list(
+            filter(lambda x: str(x.source_branch) == str(branch_from) and str(x.target_branch) == str(branch_to),
+                   merge_requests))
+        if len(filtered_merge_requests) == 0:
+            return None
+        else:
+            return filtered_merge_requests[0]
+
+    def _make_merge_request_description(self, model, description, issue_id):
+        if description is not None:
+            return description
+
+        if model is not None:
+            replaced_model = model
+        else:
+            replaced_model = 'Closes #0'
+
+        if issue_id is not None:
+            replaced_model.replace('Closes #0', 'Closes #' + str(issue_id))
+
+        return replaced_model
+
+    def _get_merge_request_md(self, path):
+        merge_request_md_file = path + '/.gitlab_manager/merge_request_templates/merge_request.md'
+
+        if os.path.exists(merge_request_md_file):
+            F = open(merge_request_md_file, 'r')
+            return F.read()
+        else:
+            return None
+
     def _validate_merge_request(self, merge_request):
         if merge_request is None:
             raise RuntimeWarning('Merge request not found for current branch')
@@ -118,22 +135,11 @@ class MergeRequest(ApiMergeRequest):
 
         return True
 
-    def validate_merge_request_by_url_and_branch(self, git_url, branch):
+    def _validate_merge_request_by_url_and_branch(self, git_url, branch):
         merge_request = self.find_merge_request_by_url_and_branch(git_url, branch)
         return self._validate_merge_request(merge_request)
 
-    def validate_merge_request_by_url_and_branches(self, git_url, branch_from, branch_to):
-        merge_request = self._find_merge_request_by_url_and_branches(git_url, branch_from, branch_to)
-
-        return self._validate_merge_request(merge_request)
-
-    def validate_and_close_merge_request(self, git_url, branch):
-        mergeRequest = self.find_merge_request_by_url_and_branch(git_url, branch)
-
-        if self._validate_merge_request(mergeRequest):
-            mergeRequest.merge()
-
-    def validate_and_close_merge_request_by_branches(self, git_url, branch_from, branch_to):
+    def _validate_and_close_merge_request_by_branches(self, git_url, branch_from, branch_to):
         merge_request = self._find_merge_request_by_url_and_branches(git_url, branch_from, branch_to)
 
         if self._validate_merge_request(merge_request):

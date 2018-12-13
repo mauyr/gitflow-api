@@ -7,8 +7,12 @@ import abc
 class ApiMergeRequest(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self):
-        pass
+    global path
+    global gl
+
+    def __init__(self, gl, path):
+        self.path = path
+        self.gl = gl
 
     @abc.abstractmethod
     def find_merge_request_by_url_and_branch(self, git_url, branch):
