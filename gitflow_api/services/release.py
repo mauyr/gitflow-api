@@ -102,6 +102,8 @@ class Release:
 
         git.create_tag(VERSION.format(project_name, version), changelog)
 
+        project_management.deploy()
+
         # update patch version for next tag
         new_version = self._update_version(Version.PATCH, False)
 
