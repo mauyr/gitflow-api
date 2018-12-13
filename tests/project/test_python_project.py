@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 from unittest import TestCase
 from unittest.mock import patch
 
-from gitlab_gitflow.project.python_project import PythonProject
+from gitflow.project.python_project import PythonProject
 import os
 
 

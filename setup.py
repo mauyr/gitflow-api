@@ -12,9 +12,9 @@ test_requires = []
 # end
 
 setup(
-    name="Gitflow",
+    name="gitflow-api",
     version="0.0.9",
-    description="Gitflow library using a API as backend",
+    description="Gitflow-API library using a API as backend",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
     url="https://github.com/mauyr/gitflow",
@@ -26,7 +26,7 @@ setup(
     python_requires='>=3.0',
     install_requires=install_requires,
     test_requirements=test_requires + install_requires,
-    long_description="Gitflow is a python library used use a gitflow methodology on development using a API like "
+    long_description="Gitflow-API is a python library used use a gitflow methodology on development using a API like "
                      "Gitlab or Github to execute most of process",
     classifiers=[
         # Picked from

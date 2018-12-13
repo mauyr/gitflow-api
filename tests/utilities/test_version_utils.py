@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 from unittest import TestCase
 
-from utilities.version_utils import VersionUtils, Version
+from gitflow.utilities.version_utils import VersionUtils, Version
 
 
 class TestVersionUtils(TestCase):

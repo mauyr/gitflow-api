@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 from unittest import TestCase
-from utilities.git_helper import GitHelper
+from gitflow.utilities.git_helper import GitHelper
 
 
 class TestGitHelper(TestCase):
