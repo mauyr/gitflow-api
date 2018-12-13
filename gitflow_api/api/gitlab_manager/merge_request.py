@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import os
+import re
 
 from gitflow_api.api.gitlab_manager.project import Project
 from gitflow_api.api.api_merge_request import ApiMergeRequest
@@ -61,7 +62,7 @@ class MergeRequest(ApiMergeRequest):
 
         group_name = merge_request_code[:merge_request_code.find('/')]
         project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
-        merge_request_id = merge_request_code[merge_request_code.find('!') + 1:].replace('\n', '')
+        merge_request_id = re.search('([1-9])\w+', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
 
         group = self.project_api.find_group_by_name(group_name)
         project = self.project_api.find_project_by_group_and_name(group, project_name)
