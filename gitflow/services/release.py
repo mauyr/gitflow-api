@@ -94,7 +94,11 @@ class Release:
 
         group_name, project_name = git.extract_group_and_project()
 
-        changelog = Changelog().create_changelog(MASTER_BRANCH)
+        changelog = ''
+        try:
+            changelog = Changelog().create_changelog(MASTER_BRANCH)
+        except Exception as e:
+            print("Fail to create changelog", e)
 
         git.create_tag(VERSION.format(project_name, version), changelog)
 
