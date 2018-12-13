@@ -15,6 +15,6 @@ class GitlabManager(Api):
     global gl
 
     def __init__(self, api_key, api_url):
-        super(Api, self).__init__(api_key, api_url)
+        super(GitlabManager, self).__init__(api_key, api_url)
 
         self.gl = gitlab.Gitlab(self.api_url, private_token=self.api_key)
