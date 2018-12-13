@@ -3,9 +3,9 @@
 
 import os
 
+from gitflow.api.api_strategy import ApiStrategy
 from gitflow.config.properties import *
 from gitflow.utilities.git_helper import GitHelper
-from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
 from gitflow.project.project_manager_strategy import ProjectManagerStrategy
 from gitflow.utilities.version_utils import VersionUtils, Version
 
@@ -90,7 +90,7 @@ class Changelog:
         return tag_commit
 
     def _normalize_issues(self, commits):
-        gitlab = GitlabManager()
+        api = ApiStrategy.get_instance(os.getcwd())
         changelog_issues = ChangelogIssues()
 
         for commit in commits:
@@ -99,7 +99,7 @@ class Changelog:
 
             message = commit.message
             if message.find('See merge request') >= 0:
-                merge_request = gitlab.find_merge_request_by_commit_message(message)
+                merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(message)
                 if merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels)

@@ -12,10 +12,10 @@ from gitflow.api.gitlab_manager.project import Project
 
 
 class GitlabManager(Api):
-    def get_project(self):
+    def get_project_api(self):
         return Project()
 
-    def get_merge_request(self):
+    def get_merge_request_api(self):
         return MergeRequest()
 
     global gl
