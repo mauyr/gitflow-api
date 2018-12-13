@@ -57,7 +57,7 @@ class Changelog:
     def _find_last_tag(self, project_name, tags):
         path = os.getcwd()
 
-        project_management = ProjectManagerStrategy().get_instance(path)
+        project_management = ProjectManagerStrategy.get_instance(path)
         actual_version = project_management.actual_version().replace('-SNAPSHOT', '')
         # ultima tag
         tag_commit = tags[0]

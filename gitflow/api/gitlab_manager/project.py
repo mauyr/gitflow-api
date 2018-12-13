@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
+from gitlab_gitflow.api.api_project import ApiProject
 from gitlab_gitflow.utilities.git_helper import GitHelper
 
 
-class Project:
+class Project(ApiProject):
 
     def find_project_by_url(self, url):
         group_name, project_name = GitHelper.extract_group_and_project_from_url(url)

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import os
+
+from gitlab_gitflow.api.api_strategy import ApiStrategy
 from gitlab_gitflow.config.properties import *
-from api.gitlab_manager.gitlab_manager import GitlabManager
 from gitlab_gitflow.utilities.git_helper import GitHelper
 from gitlab_gitflow.services.changelog import Changelog
 from gitlab_gitflow.utilities.version_utils import VersionUtils, Version
@@ -37,6 +38,8 @@ class Release:
 
     def release_finish(self, args):
         gitlab_helper = GitlabManager()
+        api = ApiStrategy.get_instance()
+
         git = GitHelper()
         path = os.getcwd()
         os.chdir(path)
@@ -79,7 +82,7 @@ class Release:
         git.checkout_and_pull(MASTER_BRANCH)
 
         path = os.getcwd()
-        project_management = ProjectManagerStrategy().get_instance(path)
+        project_management = ProjectManagerStrategy.get_instance(path)
 
         version = project_management.actual_version().replace('-SNAPSHOT', '')
 
@@ -102,7 +105,7 @@ class Release:
 
     def _update_version(self, version_update, is_snapshot):
         path = os.getcwd()
-        project_management = ProjectManagerStrategy().get_instance(path)
+        project_management = ProjectManagerStrategy.get_instance(path)
         version = project_management.actual_version().replace('-SNAPSHOT', '')
 
         new_version = VersionUtils.get_new_version(version, version_update, is_snapshot, +1)
@@ -113,7 +116,7 @@ class Release:
 
     def _recursive_release(self, actual_path, url_pattern, origin_group_name):
 
-        project_management = ProjectManagerStrategy().get_instance(actual_path)
+        project_management = ProjectManagerStrategy.get_instance(actual_path)
 
         os.chdir(actual_path)
 
@@ -131,7 +134,7 @@ class Release:
                 path = self._checkout_dependency(STAGING_BRANCH, actual_path, dependency, origin_group_name,
                                                  url_pattern)
                 try:
-                    dependency_project_manager = ProjectManagerStrategy().get_instance(path)
+                    dependency_project_manager = ProjectManagerStrategy.get_instance(path)
                     os.chdir(path)
                     git = GitHelper()
 
@@ -173,7 +176,7 @@ class Release:
                 print('Merge request created: {}'.format(mergeRequest.iid))
 
     def _create_recursive_merge_request(self, branch, actual_path, url_pattern, origin_group_name):
-        project_management = ProjectManagerStrategy().get_instance(actual_path)
+        project_management = ProjectManagerStrategy.get_instance(actual_path)
 
         os.chdir(actual_path)
         git = GitHelper()
@@ -197,6 +200,7 @@ class Release:
                                                          origin_group_name))
 
         gitlab = GitlabManager()
+        api = ApiStrategy
 
         merge_request = gitlab.find_merge_request_by_url_and_branch(git.get_current_url(), branch)
         if merge_request is None:

@@ -1,8 +1,28 @@
 #!/usr/bin/env python
 
+import gitlab
 import os
+import re
 
-class MergeRequest:
+from gitlab_gitflow.api.api import Api
+from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitlab_gitflow.api.gitlab_manager.merge_request import MergeRequest
+from gitlab_gitflow.api.gitlab_manager.project import Project
+
+
+class GitlabManager(Api):
+    def get_project(self):
+        return Project()
+
+    def get_merge_request(self):
+        return MergeRequest()
+
+    global gl
+
+    def __init__(self, api_key, api_url):
+        super(Api, self).__init__(api_key, api_url)
+
+        self.gl = gitlab.Gitlab(self.api_url, private_token=self.api_key)
 
     def find_merge_request_by_url_and_branch(self, git_url, branch):
         project = self.find_project_by_url(git_url)
@@ -42,11 +62,25 @@ class MergeRequest:
 
         group_name = merge_request_code[:merge_request_code.find('/')]
         project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
-        merge_request_id = merge_request_code[merge_request_code.find('!') + 1:].replace('\n', '')
+        merge_request_id = re.search('([1-9])\w+', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
 
         group = self.find_group_by_name(group_name)
         project = self._find_project_by_group_and_name(group, project_name)
         return project.mergerequests.get(merge_request_id)
+
+    def find_project_by_url(self, url):
+        group_name, project_name = GitHelper.extract_group_and_project_from_url(url)
+        group = self.find_group_by_name(group_name)
+
+        return self._find_project_by_group_and_name(group, project_name)
+
+    def find_group_by_name(self, group_name):
+        return self.gl.groups.get(group_name)
+
+    def _find_project_by_group_and_name(self, group, project_name):
+        projects = group.projects.list(all=True)
+        project = list(filter(lambda x: x.name == project_name, projects))[0]
+        return self.gl.projects.get(project.id)
 
     def _make_merge_request_description(self, model, description, issue_id):
         if description is not None:

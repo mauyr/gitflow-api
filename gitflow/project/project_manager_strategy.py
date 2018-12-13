@@ -9,7 +9,8 @@ from gitlab_gitflow.project.python_project import PythonProject
 
 class ProjectManagerStrategy:
 
-    def get_instance(self, path):
+    @staticmethod
+    def get_instance(path):
         os.chdir(path)
         if os.path.exists('pom.xml'):
             return MavenProject(path)
