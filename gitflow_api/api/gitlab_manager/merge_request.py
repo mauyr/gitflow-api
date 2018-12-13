@@ -10,8 +10,8 @@ from gitflow_api.api.api_merge_request import ApiMergeRequest
 class MergeRequest(ApiMergeRequest):
     global project_api
 
-    def __init__(self, gl, path):
-        super(ApiMergeRequest, self).__init__(gl, path)
+    def __init__(self, gl):
+        super(MergeRequest, self).__init__(gl)
         self.project_api = Project(gl)
 
     def find_merge_request_by_url_and_branch(self, git_url, branch):

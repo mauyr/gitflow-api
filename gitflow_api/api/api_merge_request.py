@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import abc
+import os
 
 
 class ApiMergeRequest(object):
@@ -10,8 +11,8 @@ class ApiMergeRequest(object):
     global path
     global gl
 
-    def __init__(self, gl, path):
-        self.path = path
+    def __init__(self, gl):
+        self.path = os.getcwd()
         self.gl = gl
 
     @abc.abstractmethod
