@@ -3,9 +3,9 @@
 
 import os
 
-from gitflow.project.angular_project import AngularProject
-from gitflow.project.maven_project import MavenProject
-from gitflow.project.python_project import PythonProject
+from gitflow_api.project.angular_project import AngularProject
+from gitflow_api.project.maven_project import MavenProject
+from gitflow_api.project.python_project import PythonProject
 
 
 class ProjectManagerStrategy:

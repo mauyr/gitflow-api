@@ -4,8 +4,8 @@
 import configparser
 import os
 
-from gitflow.api.gitlab_manager.gitlab_manager import GitlabManager
-from gitflow.utilities.git_helper import GitHelper
+from gitflow_api.api.gitlab_manager.gitlab_manager import GitlabManager
+from gitflow_api.utilities.git_helper import GitHelper
 
 
 class ApiStrategy:
@@ -13,9 +13,9 @@ class ApiStrategy:
     @staticmethod
     def get_instance(path):
         os.chdir(path)
-        if os.path.exists('gitflow.config'):
+        if os.path.exists('gitflow_api-api.config'):
             config = configparser.ConfigParser()
-            config.read("gitflow.config")
+            config.read("gitflow_api-api.config")
             api_type = str(config['API']['ApiType']).lower()
             api_key = str(config['API']['ApiKey'])
             api_url = str(config['API']['ApiUrl'])

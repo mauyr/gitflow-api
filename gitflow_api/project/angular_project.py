@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from gitflow.project.project_manager import ProjectManager
+from gitflow_api.project.project_manager import ProjectManager
 
 
 class AngularProject(ProjectManager):

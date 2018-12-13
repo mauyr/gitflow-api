@@ -3,7 +3,7 @@
 
 from subprocess import check_call
 
-from gitflow.project.project_manager import ProjectManager
+from gitflow_api.project.project_manager import ProjectManager
 
 import re
 import shutil

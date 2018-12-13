@@ -3,8 +3,8 @@
 
 import os
 
-from gitflow.api.gitlab_manager.project import Project
-from gitflow.api.api_merge_request import ApiMergeRequest
+from gitflow_api.api.gitlab_manager.project import Project
+from gitflow_api.api.api_merge_request import ApiMergeRequest
 
 
 class MergeRequest(ApiMergeRequest):

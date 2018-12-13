@@ -3,8 +3,8 @@
 
 import gitlab
 
-from gitflow.api.api import Api
-from gitflow.api.gitlab_manager.merge_request import MergeRequest
+from gitflow_api.api.api import Api
+from gitflow_api.api.gitlab_manager.merge_request import MergeRequest
 
 
 class GitlabManager(Api):

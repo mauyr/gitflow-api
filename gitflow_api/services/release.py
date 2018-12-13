@@ -3,12 +3,12 @@
 
 import os
 
-from gitflow.api.api_strategy import ApiStrategy
-from gitflow.config.properties import *
-from gitflow.utilities.git_helper import GitHelper
-from gitflow.services.changelog import Changelog
-from gitflow.utilities.version_utils import VersionUtils, Version
-from gitflow.project.project_manager_strategy import ProjectManagerStrategy
+from gitflow_api.api.api_strategy import ApiStrategy
+from gitflow_api.config.properties import *
+from gitflow_api.utilities.git_helper import GitHelper
+from gitflow_api.services.changelog import Changelog
+from gitflow_api.utilities.version_utils import VersionUtils, Version
+from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
 
 
 class Release:

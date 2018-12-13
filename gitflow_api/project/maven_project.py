@@ -3,7 +3,7 @@
 
 from subprocess import check_call
 
-from gitflow.project.project_manager import ProjectManager, Dependency
+from gitflow_api.project.project_manager import ProjectManager, Dependency
 
 from xml.etree import ElementTree
 

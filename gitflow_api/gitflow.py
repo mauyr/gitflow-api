@@ -2,10 +2,10 @@
 # encoding: utf-8
 import argparse
 
-from gitflow.services.feature import Feature
-from gitflow.services.hotfix import Hotfix
-from gitflow.services.release import Release
-from gitflow.services.changelog import Changelog
+from gitflow_api.services.feature import Feature
+from gitflow_api.services.hotfix import Hotfix
+from gitflow_api.services.release import Release
+from gitflow_api.services.changelog import Changelog
 
 
 def main():

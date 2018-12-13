@@ -4,7 +4,7 @@
 import abc
 import os
 
-from gitflow.api.api_merge_request import ApiMergeRequest
+from gitflow_api.api.api_merge_request import ApiMergeRequest
 
 class Api(object):
     __metaclass__ = abc.ABCMeta
