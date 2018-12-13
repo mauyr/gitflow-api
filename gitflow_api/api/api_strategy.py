@@ -13,9 +13,9 @@ class ApiStrategy:
     @staticmethod
     def get_instance(path):
         os.chdir(path)
-        if os.path.exists('gitflow_api-api.config'):
+        if os.path.exists('gitflow.config'):
             config = configparser.ConfigParser()
-            config.read("gitflow_api-api.config")
+            config.read("gitflow.config")
             api_type = str(config['API']['ApiType']).lower()
             api_key = str(config['API']['ApiKey'])
             api_url = str(config['API']['ApiUrl'])
