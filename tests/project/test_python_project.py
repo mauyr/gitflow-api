@@ -4,7 +4,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from gitflow.project.python_project import PythonProject
+from gitflow_api.project.python_project import PythonProject
 import os
 
 

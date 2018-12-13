@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from unittest import TestCase
-from gitflow.utilities.git_helper import GitHelper
+from gitflow_api.utilities.git_helper import GitHelper
 
 
 class TestGitHelper(TestCase):

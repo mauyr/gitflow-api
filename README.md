@@ -25,7 +25,7 @@ A distribution package can be obtained for manual installation at:
 
 If you like to clone from source, you can do it like so:
 
-`git clone https://github.com/mauyr/gitlab-gitflow.git`
+`git clone https://github.com/mauyr/gitflow-api.git`
 
 ### RUNNING TESTS
 `python -m tests`
@@ -34,21 +34,21 @@ If you like to clone from source, you can do it like so:
 ## Usability
 
 ### Hotfix
-`gitflow.py hotfix-start --branch=hotfix-branch-1`
+`gitflow hotfix-start --branch=hotfix-branch-1`
 
-`gitflow.py hotfix-finish` 
+`gitflow hotfix-finish` 
 
 ### Features
-`gitflow.py feature-start --branch=feature-branch-1`
+`gitflow feature-start --branch=feature-branch-1`
 
-`gitflow.py feature-finish`
+`gitflow feature-finish`
 
 
 ### Release
-`gitflow.py release-start`
+`gitflow release-start`
 
-`gitflow.py release-finish`
+`gitflow release-finish`
 
-`gitflow.py launch`
+`gitflow launch`
 
-`gitflow.py changelog`
+`gitflow changelog`

@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from gitflow.utilities.version_utils import VersionUtils, Version
+from gitflow_api.utilities.version_utils import VersionUtils, Version
 
 
 class TestVersionUtils(TestCase):
