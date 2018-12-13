@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
 import os
 
-from gitlab_gitflow.api.api_merge_request import ApiMergeRequest
+from gitflow.api.api_merge_request import ApiMergeRequest
 
 
 class MergeRequest(ApiMergeRequest):

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
-from gitlab_gitflow.api.api_project import ApiProject
-from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitflow.api.api_project import ApiProject
+from gitflow.utilities.git_helper import GitHelper
 
 
 class Project(ApiProject):

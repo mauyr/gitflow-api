@@ -1,13 +1,14 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
 import gitlab
 import os
 import re
 
-from gitlab_gitflow.api.api import Api
-from gitlab_gitflow.utilities.git_helper import GitHelper
-from gitlab_gitflow.api.gitlab_manager.merge_request import MergeRequest
-from gitlab_gitflow.api.gitlab_manager.project import Project
+from gitflow.api.api import Api
+from gitflow.utilities.git_helper import GitHelper
+from gitflow.api.gitlab_manager.merge_request import MergeRequest
+from gitflow.api.gitlab_manager.project import Project
 
 
 class GitlabManager(Api):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
-from gitlab_gitflow.utilities.git_helper import GitHelper
+from gitflow.utilities.git_helper import GitHelper
 
 
 class Project:
