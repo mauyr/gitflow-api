@@ -94,13 +94,15 @@ class Release:
 
         group_name, project_name = git.extract_group_and_project()
 
-        changelog = ''
-        try:
-            changelog = Changelog().create_changelog(MASTER_BRANCH)
-        except Exception as e:
-            print("Fail to create changelog", e)
+        # FIXME: Usar o changlog para atualizar o texto da tag no gitlab e não como commit message
+        # changelog = ''
+        # try:
+        #     changelog = Changelog().create_changelog(MASTER_BRANCH)
+        # except Exception as e:
+        #     changelog = 'Changelog not generated'
+        #     print("Fail to create changelog", e)
 
-        git.create_tag(VERSION.format(project_name, version), changelog)
+        git.create_tag(VERSION.format(project_name, version), version)
 
         project_management.deploy()
 

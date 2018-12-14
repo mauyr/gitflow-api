@@ -59,7 +59,7 @@ class GitHelper:
         check_call(git_cmd.format(branch), shell=True)
 
     def create_tag(self, tag, message):
-        git_cmd = 'git tag -a {} -m "{}"'
+        git_cmd = 'git tag -a "{}" -m "{}"'
         check_call(git_cmd.format(tag, message), shell=True)
 
         git_cmd = 'git push -u origin {}'
