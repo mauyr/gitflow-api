@@ -69,6 +69,9 @@ class GitHelper:
         try:
             git_cmd = 'git merge --no-commit {}'
             check_call(git_cmd.format(branch), shell=True)
+
+            git_cmd = 'git push -u origin {}'
+            check_call(git_cmd.format(branch), shell=True)
         except Exception:
             git_cmd = 'git reset HEAD --hard'
             check_call(git_cmd, shell=True)
