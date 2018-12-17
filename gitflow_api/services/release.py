@@ -212,7 +212,7 @@ class Release:
         if merge_request is None:
             description = str('## Merge requests\n')
             for createdMergeRequests in merge_requests:
-                description = description + '* ' + createdMergeRequests.web_url.encode('utf-8').strip() + '\n'
+                description = description + '* ' + createdMergeRequests.web_url + '\n'
 
             description = description + Changelog().create_changelog(branch, path=actual_path)
 

@@ -50,7 +50,7 @@ class VersionUtils:
         try:
             splitted_version = version.replace('-SNAPSHOT', '').split('.')
             return int(splitted_version[len(splitted_version) - version_type.value])
-        except UnboundLocalError:
+        except Exception as e:
             return -1
 
 
