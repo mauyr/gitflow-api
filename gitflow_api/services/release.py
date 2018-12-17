@@ -58,6 +58,9 @@ class Release:
             raise ValueError(e)
 
         # Synchronization merge request from master to staging to execute after finish release
+        git.get_git_cmd().checkout(MASTER_BRANCH)
+        git.get_git_cmd().pull()
+
         git.get_git_cmd().checkout(STAGING_BRANCH)
         git.get_git_cmd().pull()
         try:
