@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from subprocess import check_call
+from subprocess import check_call, run
 
 from gitflow_api.project.project_manager import ProjectManager
 
@@ -66,7 +66,7 @@ class PythonProject(ProjectManager):
         check_call(cmd, shell=True)
 
         cmd = 'twine upload dist/*'
-        check_call(cmd, shell=True)
+        run(cmd, shell=True, check=True)
 
     @staticmethod
     def _get_version_filename():
