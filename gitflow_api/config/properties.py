@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# Config file
+CONFIG_FILE = 'gitflow.config'
+
+# Branches structure
 MASTER_BRANCH = 'master'
 STAGING_BRANCH = 'staging'
 
@@ -9,7 +13,7 @@ RELEASE_BRANCH = 'release/{}'
 
 VERSION = '{}-{}'
 
-#Issue Classification - Gitlab Labels
+# Issue Classification - Api Labels
 FEATURE_LABELS = ['story', 'feature']
 CHANGE_LABELS = ['change']
 BUG_LABELS = ['bug']

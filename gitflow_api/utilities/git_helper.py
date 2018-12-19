@@ -29,8 +29,7 @@ class GitHelper:
         git_cmd = 'git checkout -b {}'
         check_call(git_cmd.format(new_branch), shell=True)
 
-        git_cmd = 'git push -u origin {}'
-        check_call(git_cmd.format(new_branch), shell=True)
+        self.push_branch(new_branch)
 
     def checkout_and_pull(self, branch):
         try:
@@ -55,6 +54,9 @@ class GitHelper:
             print('Nothing to commmit. Skipping.')
             return
 
+        self.push_branch(branch)
+
+    def push_branch(self, branch):
         git_cmd = 'git push -u origin {}'
         check_call(git_cmd.format(branch), shell=True)
 
@@ -62,21 +64,21 @@ class GitHelper:
         git_cmd = 'git tag -a "{}" -m "{}"'
         check_call(git_cmd.format(tag, message), shell=True)
 
-        git_cmd = 'git push -u origin {}'
-        check_call(git_cmd.format(tag), shell=True)
+        self.push_branch(tag)
 
-    def check_conflicts(self, branch):
+    def check_conflicts(self, from_branch, to_branch):
         try:
             git_cmd = 'git merge --no-commit {}'
-            check_call(git_cmd.format(branch), shell=True)
+            check_call(git_cmd.format(from_branch), shell=True)
 
-            git_cmd = 'git push -u origin {}'
-            check_call(git_cmd.format(branch), shell=True)
+            self.push_branch(to_branch)
         except Exception:
             git_cmd = 'git reset HEAD --hard'
             check_call(git_cmd, shell=True)
 
-            raise RuntimeError('Conflict with branch {}'.format(branch))
+            group_name, project_name = self.extract_group_and_project()
+
+            raise RuntimeError('Project {} has conflict from branch {} into {}'.format(project_name, from_branch, to_branch))
 
     def extract_group_and_project(self):
         return GitHelper.extract_group_and_project_from_url(self.get_current_url())
