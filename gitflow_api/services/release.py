@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import configparser
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
@@ -27,7 +27,7 @@ class Release:
         git.get_git_cmd().checkout(STAGING_BRANCH)
         git.get_git_cmd().pull()
 
-        git.check_conflicts(MASTER_BRANCH)
+        git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
 
         # print(urlPattern)
         release_branch = RELEASE_BRANCH.format(self._recursive_release(initial_path, url_pattern, group_name))
@@ -64,7 +64,7 @@ class Release:
         git.get_git_cmd().checkout(STAGING_BRANCH)
         git.get_git_cmd().pull()
         try:
-            git.check_conflicts(MASTER_BRANCH)
+            git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
         except Exception as e:
             print(e)
             api.get_merge_request_api().create_merge_request(git.get_current_url(), MASTER_BRANCH,
@@ -97,13 +97,11 @@ class Release:
 
         group_name, project_name = git.extract_group_and_project()
 
-        # FIXME: Usar o changlog para atualizar o texto da tag no gitlab e não como commit message
-        # changelog = ''
-        # try:
-        #     changelog = Changelog().create_changelog(MASTER_BRANCH)
-        # except Exception as e:
-        #     changelog = 'Changelog not generated'
-        #     print("Fail to create changelog", e)
+
+        try:
+            changelog = self._create_and_write_changelog(project_name, version)
+        except Exception as e:
+            print("Fail to create changelog", e)
 
         git.create_tag(VERSION.format(project_name, version), version)
 
@@ -113,6 +111,18 @@ class Release:
         new_version = self._update_version(Version.PATCH, False)
 
         git.commit_and_push_update_message(MASTER_BRANCH, new_version)
+
+    def _create_and_write_changelog(self, project_name, version):
+        changelog = Changelog().create_changelog(MASTER_BRANCH)
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        if bool(config['CHANGELOG']['create_file']):
+            filename = VERSION.format(project_name, version)
+            release_notes = open(config['CHANGELOG']['path'] + "./" + filename, 'w')
+            release_notes.write(changelog)
+            release_notes.close()
+
+        return changelog
 
     def _update_version(self, version_update, is_snapshot):
         path = os.getcwd()
