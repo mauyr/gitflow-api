@@ -66,7 +66,7 @@ class PythonProject(ProjectManager):
         check_call(cmd, shell=True)
 
         cmd = 'twine upload dist/*'
-        run(cmd, shell=True, check=True)
+        check_call(cmd, shell=True)
 
     @staticmethod
     def _get_version_filename():
