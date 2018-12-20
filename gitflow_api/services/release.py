@@ -114,15 +114,24 @@ class Release:
 
     def _create_and_write_changelog(self, project_name, version):
         changelog = Changelog().create_changelog(MASTER_BRANCH)
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
+        config = self._read_config_file()
         if bool(config['CHANGELOG']['create_file']):
             filename = VERSION.format(project_name, version)
-            release_notes = open(config['CHANGELOG']['path'] + "./" + filename, 'w')
+
+            path = config['CHANGELOG']['path']
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+            release_notes = open(path + './' + filename, 'w')
             release_notes.write(changelog)
             release_notes.close()
 
         return changelog
+
+    def _read_config_file(self):
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        return config
 
     def _update_version(self, version_update, is_snapshot):
         path = os.getcwd()
