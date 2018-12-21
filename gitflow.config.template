@@ -10,4 +10,5 @@ path = release_notes/
 [SLACK]
 post_updates = false
 key =
-channel =
+release_channel =
+launch_channel =
