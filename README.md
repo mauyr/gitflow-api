@@ -27,6 +27,10 @@ If you like to clone from source, you can do it like so:
 
 `git clone https://github.com/mauyr/gitflow-api.git`
 
+### Binary distribution
+`pyinstaller --onefile gitflow_api/gitflow.py`
+
+
 ### RUNNING TESTS
 `python -m tests`
 
@@ -51,4 +55,4 @@ If you like to clone from source, you can do it like so:
 
 `gitflow launch`
 
-`gitflow changelog`
+`gitflow changelog` 
