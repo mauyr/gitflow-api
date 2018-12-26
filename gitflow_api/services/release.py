@@ -249,7 +249,13 @@ class Release:
             for createdMergeRequests in merge_requests:
                 description = description + '* ' + createdMergeRequests.web_url + '\n'
 
-            description = description + Changelog().create_markdown_changelog(branch, path=actual_path)
+            changelog = Changelog().create_changelog(branch, path=actual_path)
+            try:
+                self._post_changelog(changelog, 'release')
+            except (ModuleNotFoundError, NotImplementedError):
+                pass
+
+            description = description + Changelog.make_changelog_md(changelog)
 
             merge_requests.append(
                 api.get_merge_request_api().create_merge_request(git.get_current_url(), branch,
