@@ -7,8 +7,8 @@ url = https://github.com/yourgroup/yourname
 create_file = true
 path = release_notes/
 
-[SLACK]
+[COMMUNICATOR]
+type = Slack
 post_updates = false
-key =
-release_channel =
-launch_channel =
+release_webhook =
+launch_webhook =

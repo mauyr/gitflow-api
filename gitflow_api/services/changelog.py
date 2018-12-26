@@ -27,6 +27,11 @@ class Changelog:
 
         return self._create_changelog(branch, from_tag=from_tag, path=path)
 
+    def create_markdown_changelog(self, branch, from_tag=None, path=None):
+        changelog_issues = self.create_changelog(branch, from_tag=from_tag, path=path)
+
+        return self.make_changelog_md(changelog_issues)
+
     def _create_changelog(self, branch, from_tag=None, path=None):
 
         if path is not None:
@@ -52,9 +57,7 @@ class Changelog:
 
         commits = self._get_commit_by_log(log)
 
-        changelog_issues = self._normalize_issues(commits)
-
-        return self._make_changelog_md(changelog_issues)
+        return self._normalize_issues(commits)
 
     def _find_last_tag(self, project_name, tags):
         path = os.getcwd()
@@ -143,7 +146,8 @@ class Changelog:
 
         return commits
 
-    def _make_changelog_md(self, changelog_issues):
+    @staticmethod
+    def make_changelog_md(changelog_issues):
         merge_request_md = ''
         if len(changelog_issues.stories) > 0:
             merge_request_md = merge_request_md + '\n' + str('## Improvements')

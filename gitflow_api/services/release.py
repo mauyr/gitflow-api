@@ -4,6 +4,7 @@ import configparser
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
+from gitflow_api.communicator.communicator_strategy import CommunicatorStrategy
 from gitflow_api.config.properties import *
 from gitflow_api.utilities.git_helper import GitHelper
 from gitflow_api.services.changelog import Changelog
@@ -100,6 +101,9 @@ class Release:
 
         try:
             changelog = self._create_and_write_changelog(project_name, version)
+            self._post_changelog(changelog, 'launch')
+        except (ModuleNotFoundError, NotImplementedError):
+            pass
         except Exception as e:
             print("Fail to create changelog", e)
 
@@ -114,6 +118,7 @@ class Release:
 
     def _create_and_write_changelog(self, project_name, version):
         changelog = Changelog().create_changelog(MASTER_BRANCH)
+
         config = self._read_config_file()
         if bool(config['CHANGELOG']['create_file']):
             filename = VERSION.format(project_name, version)
@@ -123,10 +128,18 @@ class Release:
                 os.makedirs(path)
 
             release_notes = open(path + './' + filename, 'w')
-            release_notes.write(changelog)
+            release_notes.write(Changelog.make_changelog_md(changelog))
             release_notes.close()
 
         return changelog
+
+    def _post_changelog(self, changelog, channel):
+        communicator = CommunicatorStrategy.get_instance()
+        if channel == 'release':
+            communicator.send_changelog(changelog, communicator.release_webhook)
+        else:
+            communicator.send_changelog(changelog, communicator.launch_webhook)
+
 
     def _read_config_file(self):
         config = configparser.ConfigParser()
@@ -236,7 +249,7 @@ class Release:
             for createdMergeRequests in merge_requests:
                 description = description + '* ' + createdMergeRequests.web_url + '\n'
 
-            description = description + Changelog().create_changelog(branch, path=actual_path)
+            description = description + Changelog().create_markdown_changelog(branch, path=actual_path)
 
             merge_requests.append(
                 api.get_merge_request_api().create_merge_request(git.get_current_url(), branch,

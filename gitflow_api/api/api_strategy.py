@@ -16,7 +16,12 @@ class ApiStrategy:
     @staticmethod
     def get_instance(path):
         os.chdir(path)
-        api_type = os.environ['GITFLOW_API_TYPE']
+        api_type = None
+
+        try:
+            api_type = os.environ['GITFLOW_API_TYPE']
+        except Exception as e:
+            pass
 
         if os.path.exists(CONFIG_FILE):
             return ApiStrategy._get_api_by_config_file(CONFIG_FILE)
