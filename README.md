@@ -21,7 +21,7 @@ Both commands will install the required package dependencies.
 
 A distribution package can be obtained for manual installation at:
 
-`http://pypi.python.org/pypi/Gitlab-Gitflow`
+`http://pypi.python.org/pypi/gitflow-api`
 
 If you like to clone from source, you can do it like so:
 

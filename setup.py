@@ -7,7 +7,7 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
-install_requires = ['GitPython>=2.1.11','python-gitlab>=1.6.0']
+install_requires = ['GitPython>=2.1.11','python-gitlab>=1.6.0','slackclient>=1.3.0']
 test_requires = []
 # end
 

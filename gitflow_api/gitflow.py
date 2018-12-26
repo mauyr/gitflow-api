@@ -36,7 +36,7 @@ def main():
     elif args.action.lower() == 'launch':
         Release().launch()
     elif args.action.lower() == 'changelog':
-        print(Changelog().create_changelog(args.branch, from_tag=args.fromTag))
+        print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag))
     else:
         print(
             'Action not found [feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
