@@ -21,18 +21,18 @@ class Changelog:
     def __init__(self):
         pass
 
-    def create_changelog(self, branch, from_tag=None, path=None):
+    def create_changelog(self, branch, from_tag=None, path=None, only_staging=None):
         git = GitHelper()
         branch = str(git.get_current_branch() if branch is None else branch)
 
-        return self._create_changelog(branch, from_tag=from_tag, path=path)
+        return self._create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
-    def create_markdown_changelog(self, branch, from_tag=None, path=None):
-        changelog_issues = self.create_changelog(branch, from_tag=from_tag, path=path)
+    def create_markdown_changelog(self, branch, from_tag=None, path=None, only_staging=None):
+        changelog_issues = self.create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
         return self.make_changelog_md(changelog_issues)
 
-    def _create_changelog(self, branch, from_tag=None, path=None):
+    def _create_changelog(self, branch, from_tag=None, path=None, only_staging=None):
 
         if path is not None:
             os.chdir(path)
@@ -57,7 +57,7 @@ class Changelog:
 
         commits = self._get_commit_by_log(log)
 
-        return self._normalize_issues(commits)
+        return self._normalize_issues(commits, only_staging)
 
     def _find_last_tag(self, project_name, tags):
         path = os.getcwd()
@@ -92,7 +92,7 @@ class Changelog:
 
         return tag_commit
 
-    def _normalize_issues(self, commits):
+    def _normalize_issues(self, commits, only_staging):
         api = ApiStrategy.get_instance(os.getcwd())
         changelog_issues = ChangelogIssues()
 
@@ -103,7 +103,10 @@ class Changelog:
             message = commit.message
             if message.find('See merge request') >= 0:
                 merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(message)
-                if merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1:
+
+                add_changelog = merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1
+                add_changelog = add_changelog and (merge_request.target_branch == STAGING_BRANCH or not only_staging)
+                if add_changelog:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels)
                     self._add_change_log_issue(changelog_issues, issue)
@@ -130,7 +133,7 @@ class Changelog:
         commits = []
         actual_commit = Commit()
         for logLine in log:
-            line = str(logLine.encode('utf-8').strip())
+            line = str(logLine)
             if line.find('commit') >= 0:
                 if actual_commit.commit != '':
                     commits.append(actual_commit)

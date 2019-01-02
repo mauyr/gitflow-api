@@ -249,7 +249,7 @@ class Release:
             for createdMergeRequests in merge_requests:
                 description = description + '* ' + createdMergeRequests.web_url + '\n'
 
-            changelog = Changelog().create_changelog(branch, path=actual_path)
+            changelog = Changelog().create_changelog(branch, path=actual_path, only_staging=True)
             try:
                 self._post_changelog(changelog, 'release')
             except (ModuleNotFoundError, NotImplementedError):
