@@ -2,7 +2,6 @@
 # encoding: utf-8
 import configparser
 import os
-from enum import Enum
 
 from gitflow_api.communicator.communicator import CommunicatorType
 from gitflow_api.communicator.slack import Slack
