@@ -57,11 +57,8 @@ class MergeRequest(ApiMergeRequest):
 
         return self._validate_merge_request(merge_request)
 
-    def find_merge_request_by_commit_message(self, commit_message):
+    def find_merge_request_by_commit_message(self, group_name, project_name, commit_message):
         merge_request_code = commit_message[commit_message.find('See merge request ') + 18:]
-
-        group_name = merge_request_code[:merge_request_code.find('/')]
-        project_name = merge_request_code[merge_request_code.find('/') + 1:merge_request_code.find('!')]
         merge_request_id = re.search('([1-9])\w+', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
 
         group = self.project_api.find_group_by_name(group_name)

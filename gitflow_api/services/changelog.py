@@ -57,7 +57,9 @@ class Changelog:
 
         commits = self._get_commit_by_log(log)
 
-        return self._normalize_issues(commits, only_staging)
+        group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
+
+        return self._normalize_issues(group_name, project_name, commits, only_staging)
 
     def _find_last_tag(self, project_name, tags):
         path = os.getcwd()
@@ -92,7 +94,7 @@ class Changelog:
 
         return tag_commit
 
-    def _normalize_issues(self, commits, only_staging):
+    def _normalize_issues(self, group_name, project_name, commits, only_staging):
         api = ApiStrategy.get_instance(os.getcwd())
         changelog_issues = ChangelogIssues()
 
@@ -102,7 +104,8 @@ class Changelog:
 
             message = commit.message
             if message.find('See merge request') >= 0:
-                merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(message)
+
+                merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(group_name, project_name, message)
 
                 add_changelog = merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1
                 add_changelog = add_changelog and (merge_request.target_branch == STAGING_BRANCH or not only_staging)

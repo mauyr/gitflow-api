@@ -1,7 +1,7 @@
 [API]
 type = Github
 key = AAAAAAAAA
-url = https://github.com/yourgroup/yourname
+url = https://github.com
 
 [CHANGELOG]
 create_file = true

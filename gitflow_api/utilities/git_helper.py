@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import configparser
 import os
 from subprocess import check_call
 
 from git import Repo
+
+from gitflow_api.config.properties import CONFIG_FILE
 
 
 class GitHelper:
@@ -85,16 +87,29 @@ class GitHelper:
 
     @staticmethod
     def extract_group_and_project_from_url(git_url):
-        if git_url.find('http') >= 0:
-            url = git_url.split('/')
-            group_name = str(url[len(url) - 2])
-            project_name = str(url[len(url) - 1]).replace('.git', '')
-            return group_name, project_name
-        else:
-            url = git_url.split('/')
-            group_name = str(url[0][url[0].rfind(':') + 1:])
-            project_name = str(url[1]).replace('.git', '')
-            return group_name, project_name
+        api_url = GitHelper.get_api_url_from_config()
+
+        short_api_url = GitHelper.extract_url_without_protocol(api_url)
+        short_git_url = GitHelper.extract_url_without_protocol(git_url)
+
+        only_groups_and_project = short_git_url.replace(short_api_url, '')[1:].split('/')
+        project = str(only_groups_and_project[len(only_groups_and_project)-1]).replace('.git', '')
+        del only_groups_and_project[len(only_groups_and_project)-1]
+        group = '/'.join(only_groups_and_project)
+        return group, project
+
+    @staticmethod
+    def get_api_url_from_config():
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE)
+        api_url = str(config['API']['url']).lower()
+        return api_url
 
     def get_git_cmd(self):
         return self.repo.git
+
+    @staticmethod
+    def extract_url_without_protocol(url):
+        initial_pos = url.find('://')
+        initial_pos = url.find('@')+1 if initial_pos == -1 else initial_pos+3
+        return url[initial_pos:]
