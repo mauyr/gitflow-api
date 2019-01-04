@@ -43,6 +43,13 @@ class GitHelper:
         except Exception as e:
             pass
 
+    def delete_branch(self, branch):
+        try:
+            git_cmd = 'git branch -D {}'
+            check_call(git_cmd.format(branch), shell=True)
+        except Exception as e:
+            pass
+
     def commit_and_push_update_message(self, branch, version):
         self.checkout_and_pull(branch)
 

@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--issue', help='Issue ID on GitLab')
     parser.add_argument('--fromTag', help='Initial tag for changelog comparing')
     parser.add_argument('--onlyStaging', nargs='?', const=True, help='Use only staging merge requests for changelog')
+    parser.add_argument('--force', nargs='?', const=True, help='Force to recreate release')
 
     args = parser.parse_args()
 
