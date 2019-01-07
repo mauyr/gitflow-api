@@ -17,7 +17,7 @@ class Release:
     def __init__(self):
         pass
 
-    def release_start(self, force=False):
+    def release_start(self, force=False, skipTests=False):
         git = GitHelper()
 
         group_name, url_pattern = self._url_pattern_build(git)
@@ -31,7 +31,7 @@ class Release:
         git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
 
         # print(urlPattern)
-        release_branch = RELEASE_BRANCH.format(self._recursive_release(initial_path, url_pattern, group_name, force))
+        release_branch = RELEASE_BRANCH.format(self._recursive_release(initial_path, url_pattern, group_name, force, skipTests))
 
         self._create_merge_requests(initial_path, release_branch)
 
@@ -157,7 +157,7 @@ class Release:
 
         return new_version
 
-    def _recursive_release(self, actual_path, url_pattern, origin_group_name, force):
+    def _recursive_release(self, actual_path, url_pattern, origin_group_name, force, skipTests):
 
         project_management = ProjectManagerStrategy.get_instance(actual_path)
 
@@ -196,7 +196,8 @@ class Release:
 
             print('Starting release of {}'.format(os.getcwd()))
 
-            project_management.test()
+            if not skipTests:
+                project_management.test()
 
             release_branch = RELEASE_BRANCH.format(release_version)
             if force:
@@ -257,7 +258,7 @@ class Release:
             changelog = Changelog().create_changelog(branch, path=actual_path, only_staging=True)
             try:
                 self._post_changelog(changelog, 'release')
-            except (ModuleNotFoundError, NotImplementedError):
+            except Exception:
                 pass
 
             description = description + Changelog.make_changelog_md(changelog)

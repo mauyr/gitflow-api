@@ -41,7 +41,7 @@ class Changelog:
         git.checkout_and_pull(branch)
 
         if len(git.repo.tags) == 0:
-            return ''
+            return ChangelogIssues()
 
         tag_commit = ''
         if from_tag is not None:

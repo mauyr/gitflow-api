@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--fromTag', help='Initial tag for changelog comparing')
     parser.add_argument('--onlyStaging', nargs='?', const=True, help='Use only staging merge requests for changelog')
     parser.add_argument('--force', nargs='?', const=True, help='Force to recreate release')
+    parser.add_argument('--skipTests', nargs='?', const=True, help='Skip tests')
 
     args = parser.parse_args()
 
@@ -32,7 +33,7 @@ def main():
     elif args.action.lower() == 'hotfix-finish':
         Hotfix().hotfix_finish(args)
     elif args.action.lower() == 'release-start':
-        Release().release_start(force=args.force)
+        Release().release_start(force=args.force, skipTests=args.skipTests)
     elif args.action.lower() == 'release-finish':
         Release().release_finish(args)
     elif args.action.lower() == 'launch':
