@@ -202,7 +202,8 @@ class Release:
             if force:
                 git.delete_branch(release_branch)
 
-            git.create_new_branch_from(STAGING_BRANCH, release_branch)
+            if not git.checkout_and_pull(release_branch):
+                git.create_new_branch_from(STAGING_BRANCH, release_branch)
 
             project_management.deploy()
 

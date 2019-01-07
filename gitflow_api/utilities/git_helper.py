@@ -40,8 +40,9 @@ class GitHelper:
 
             git_cmd = 'git pull'
             check_call(git_cmd.format(branch), shell=True)
+            return True
         except Exception as e:
-            pass
+            return False
 
     def delete_branch(self, branch):
         try:
