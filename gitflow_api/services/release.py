@@ -102,8 +102,6 @@ class Release:
         try:
             changelog = self._create_and_write_changelog(project_name, version)
             self._post_changelog(changelog, 'launch')
-        except (ModuleNotFoundError, NotImplementedError):
-            pass
         except Exception as e:
             print("Fail to create changelog", e)
 
