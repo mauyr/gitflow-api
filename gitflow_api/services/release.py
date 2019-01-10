@@ -31,7 +31,8 @@ class Release:
         git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
 
         # print(urlPattern)
-        release_branch = RELEASE_BRANCH.format(self._recursive_release(initial_path, url_pattern, group_name, force, skipTests))
+        release_branch = RELEASE_BRANCH.format(
+            self._recursive_release(initial_path, url_pattern, group_name, force, skipTests))
 
         self._create_merge_requests(initial_path, release_branch)
 
@@ -41,45 +42,13 @@ class Release:
     def release_finish(self, args):
         git = GitHelper()
         path = os.getcwd()
-        os.chdir(path)
 
-        api = ApiStrategy.get_instance(path)
+        group_name, url_pattern = self._url_pattern_build(git)
 
         branch = str(git.get_current_branch() if args.branch is None else args.branch)
 
-        if branch.lower().find('release') < 0:
-            raise ValueError('Not valid release branch {}'.format(branch))
+        self._recursive_finish_release(path, branch, url_pattern, group_name)
 
-        # continue if dont have conflicts or merge request for release is merged
-        try:
-            api.get_merge_request_api().validate_and_close_merge_request(git.get_current_url(), branch)
-        except RuntimeWarning as ex:
-            print('Release branch merged!', ex)
-        except ValueError as e:
-            raise ValueError(e)
-
-        # Synchronization merge request from master to staging to execute after finish release
-        git.get_git_cmd().checkout(MASTER_BRANCH)
-        git.get_git_cmd().pull()
-
-        git.get_git_cmd().checkout(STAGING_BRANCH)
-        git.get_git_cmd().pull()
-        try:
-            git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
-        except Exception as e:
-            print(e)
-            api.get_merge_request_api().create_merge_request(git.get_current_url(), MASTER_BRANCH,
-                                               'Synchronization merge request {} to {}'.format(MASTER_BRANCH,
-                                                                                               STAGING_BRANCH),
-                                               'Don\'t remove this merge request before finish release', None,
-                                               STAGING_BRANCH, None)
-            api.get_merge_request_api().validate_merge_request_by_url_and_branches(git.get_current_url(), MASTER_BRANCH,
-                                                                     STAGING_BRANCH)
-
-        git.get_git_cmd().pull()
-
-        new_version = self._update_version(Version.MINOR, True)
-        git.commit_and_push_update_message(STAGING_BRANCH, new_version)
 
     def launch(self):
         git = GitHelper()
@@ -98,12 +67,9 @@ class Release:
 
         group_name, project_name = git.extract_group_and_project()
 
-
         try:
             changelog = self._create_and_write_changelog(project_name, version)
             self._post_changelog(changelog, 'launch')
-        except (ModuleNotFoundError, NotImplementedError):
-            pass
         except Exception as e:
             print("Fail to create changelog", e)
 
@@ -140,7 +106,6 @@ class Release:
         else:
             communicator.send_changelog(changelog, communicator.launch_webhook)
 
-
     def _read_config_file(self):
         config = configparser.ConfigParser()
         config.read(CONFIG_FILE)
@@ -162,8 +127,6 @@ class Release:
         project_management = ProjectManagerStrategy.get_instance(actual_path)
 
         os.chdir(actual_path)
-
-        project_management.update_dependencies_version()
 
         git = GitHelper()
         git.get_git_cmd().checkout(STAGING_BRANCH)
@@ -211,6 +174,71 @@ class Release:
             return release_version
         except RuntimeError as e:
             print('Error creating release of {}: {}'.format(os.getcwd(), str(e)))
+
+    def _recursive_finish_release(self, actual_path, branch, url_pattern, origin_group_name):
+        project_management = ProjectManagerStrategy.get_instance(actual_path)
+        os.chdir(actual_path)
+
+        dependencies = project_management.dependencies()
+        print('Total dependencies of {}: {}'.format(actual_path, len(dependencies)))
+
+        if len(dependencies) > 0:
+            for dependency in dependencies:
+                path = self._checkout_dependency(STAGING_BRANCH, actual_path, dependency, origin_group_name,
+                                                 url_pattern)
+
+                dependency_version = dependency.version.replace('-SNAPSHOT', '')
+                release_branch = 'release/' + dependency_version
+                self._recursive_finish_release(path, release_branch, dependency, origin_group_name)
+
+        try:
+            os.chdir(actual_path)
+
+            git = GitHelper()
+            api = ApiStrategy.get_instance(actual_path)
+
+            if branch.lower().find('release') != 0 or git.check_branch_exists_on_remote(branch) == 0:
+                print('Not valid release branch {}. Continuing...'.format(branch))
+                return
+
+            print('Finishing release for project {}'.format(git.get_current_url()))
+
+            # continue if dont have conflicts or merge request for release is merged
+            try:
+                api.get_merge_request_api().validate_and_close_merge_request(git.get_current_url(), branch)
+            except RuntimeWarning as ex:
+                print('Release branch merged!', ex)
+            except ValueError as e:
+                raise ValueError(e)
+
+            # Synchronization merge request from master to staging to execute after finish release
+            git.get_git_cmd().checkout(MASTER_BRANCH)
+            git.get_git_cmd().pull()
+
+            git.get_git_cmd().checkout(STAGING_BRANCH)
+            git.get_git_cmd().pull()
+            try:
+                git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
+            except Exception as e:
+                print('Found a conflict on merge master to staging. Trying a automatic merge request: ')
+                api.get_merge_request_api().create_merge_request(git.get_current_url(), MASTER_BRANCH,
+                                                                 'Synchronization merge request {} to {}'.format(
+                                                                     MASTER_BRANCH,
+                                                                     STAGING_BRANCH),
+                                                                 'Don\'t remove this merge request before finish release',
+                                                                 None,
+                                                                 STAGING_BRANCH, None)
+                api.get_merge_request_api().validate_merge_request_by_url_and_branches(git.get_current_url(),
+                                                                                       MASTER_BRANCH,
+                                                                                       STAGING_BRANCH)
+
+            git.get_git_cmd().pull()
+
+            new_version = self._update_version(Version.MINOR, True)
+            git.commit_and_push_update_message(STAGING_BRANCH, new_version)
+
+        except RuntimeError as e:
+            print('Error finishing release of {}: {}'.format(os.getcwd(), str(e)))
 
     def _create_merge_requests(self, path, branch):
         os.chdir(path)
