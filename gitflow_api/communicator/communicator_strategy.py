@@ -17,8 +17,8 @@ class CommunicatorStrategy:
             config.read(CONFIG_FILE)
             communicator_type = str(config['COMMUNICATOR']['type']).lower()
             post_updates = bool(config['COMMUNICATOR']['post_updates'])
-            communicator_release_webhook = str(config['COMMUNICATOR']['release_webhook']).lower() if config['COMMUNICATOR']['release_webhook'] is not None else os.environ['GITFLOW_COMMUNICATOR_RELEASE']
-            communicator_launch_webhook = str(config['COMMUNICATOR']['launch_webhook']).lower() if config['COMMUNICATOR']['launch_webhook'] is not None else os.environ['GITFLOW_COMMUNICATOR_LAUNCH']
+            communicator_release_webhook = str(config['COMMUNICATOR']['release_webhook']) if config['COMMUNICATOR']['release_webhook'] is not None else os.environ['GITFLOW_COMMUNICATOR_RELEASE']
+            communicator_launch_webhook = str(config['COMMUNICATOR']['launch_webhook']) if config['COMMUNICATOR']['launch_webhook'] is not None else os.environ['GITFLOW_COMMUNICATOR_LAUNCH']
 
             if communicator_type == CommunicatorType.SLACK.value and post_updates:
                 return Slack(communicator_release_webhook,communicator_launch_webhook)
