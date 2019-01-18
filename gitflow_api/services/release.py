@@ -5,7 +5,7 @@ import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
 from gitflow_api.communicator.communicator_strategy import CommunicatorStrategy
-from gitflow_api.config.properties import *
+from gitflow_api.config.config import Config, CONFIG_FILE
 from gitflow_api.utilities.git_helper import GitHelper
 from gitflow_api.services.changelog import Changelog
 from gitflow_api.utilities.version_utils import VersionUtils, Version
@@ -13,6 +13,8 @@ from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
 
 
 class Release:
+
+    CONFIG = Config()
 
     def __init__(self):
         pass
@@ -25,13 +27,13 @@ class Release:
         initial_path = os.getcwd()
 
         git = GitHelper()
-        git.get_git_cmd().checkout(STAGING_BRANCH)
+        git.get_git_cmd().checkout(self.CONFIG.staging_branch)
         git.get_git_cmd().pull()
 
-        git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
+        git.check_conflicts(self.CONFIG.master_branch, self.CONFIG.staging_branch)
 
         # print(urlPattern)
-        release_branch = RELEASE_BRANCH.format(
+        release_branch = self.CONFIG.release_branch.format(
             self._recursive_release(initial_path, url_pattern, group_name, force, skipTests))
 
         self._create_merge_requests(initial_path, release_branch)
@@ -52,7 +54,7 @@ class Release:
 
     def launch(self):
         git = GitHelper()
-        git.checkout_and_pull(MASTER_BRANCH)
+        git.checkout_and_pull(self.CONFIG.master_branch)
 
         path = os.getcwd()
         project_management = ProjectManagerStrategy.get_instance(path)
@@ -63,7 +65,7 @@ class Release:
         project_management.update_version(version)
         project_management.update_dependencies_version()
 
-        git.commit_and_push_update_message(MASTER_BRANCH, version)
+        git.commit_and_push_update_message(self.CONFIG.master_branch, version)
 
         group_name, project_name = git.extract_group_and_project()
 
@@ -73,21 +75,21 @@ class Release:
         except Exception as e:
             print("Fail to create changelog", e)
 
-        git.create_tag(VERSION.format(project_name, version), version)
+        git.create_tag(self.CONFIG.version.format(project_name, version), version)
 
         project_management.deploy()
 
         # update patch version for next tag
         new_version = self._update_version(Version.PATCH, False)
 
-        git.commit_and_push_update_message(MASTER_BRANCH, new_version)
+        git.commit_and_push_update_message(self.CONFIG.master_branch, new_version)
 
     def _create_and_write_changelog(self, project_name, version):
-        changelog = Changelog().create_changelog(MASTER_BRANCH)
+        changelog = Changelog().create_changelog(self.CONFIG.master_branch)
 
         config = self._read_config_file()
         if bool(config['CHANGELOG']['create_file']):
-            filename = VERSION.format(project_name, version)
+            filename = self.CONFIG.version.format(project_name, version)
 
             path = config['CHANGELOG']['path']
             if not os.path.exists(path):
@@ -129,7 +131,7 @@ class Release:
         os.chdir(actual_path)
 
         git = GitHelper()
-        git.get_git_cmd().checkout(STAGING_BRANCH)
+        git.get_git_cmd().checkout(self.CONFIG.staging_branch)
         git.get_git_cmd().pull()
 
         dependencies = project_management.dependencies()
@@ -137,7 +139,7 @@ class Release:
 
         if len(dependencies) > 0:
             for dependency in dependencies:
-                path = self._checkout_dependency(STAGING_BRANCH, actual_path, dependency, origin_group_name,
+                path = self._checkout_dependency(self.CONFIG.staging_branch, actual_path, dependency, origin_group_name,
                                                  url_pattern)
                 try:
                     dependency_project_manager = ProjectManagerStrategy.get_instance(path)
@@ -162,12 +164,12 @@ class Release:
             if not skipTests:
                 project_management.test()
 
-            release_branch = RELEASE_BRANCH.format(release_version)
+            release_branch = self.CONFIG.release_branch.format(release_version)
             if force:
                 git.delete_branch(release_branch)
 
             if not git.checkout_and_pull(release_branch):
-                git.create_new_branch_from(STAGING_BRANCH, release_branch)
+                git.create_new_branch_from(self.CONFIG.staging_branch, release_branch)
 
             project_management.deploy()
 
@@ -184,7 +186,7 @@ class Release:
 
         if len(dependencies) > 0:
             for dependency in dependencies:
-                path = self._checkout_dependency(STAGING_BRANCH, actual_path, dependency, origin_group_name,
+                path = self._checkout_dependency(self.CONFIG.staging_branch, actual_path, dependency, origin_group_name,
                                                  url_pattern)
 
                 dependency_version = dependency.version.replace('-SNAPSHOT', '')
@@ -212,30 +214,30 @@ class Release:
                 raise ValueError(e)
 
             # Synchronization merge request from master to staging to execute after finish release
-            git.get_git_cmd().checkout(MASTER_BRANCH)
+            git.get_git_cmd().checkout(self.CONFIG.master_branch)
             git.get_git_cmd().pull()
 
-            git.get_git_cmd().checkout(STAGING_BRANCH)
+            git.get_git_cmd().checkout(self.CONFIG.staging_branch)
             git.get_git_cmd().pull()
             try:
-                git.check_conflicts(MASTER_BRANCH, STAGING_BRANCH)
+                git.check_conflicts(self.CONFIG.master_branch, self.CONFIG.staging_branch)
             except Exception as e:
                 print('Found a conflict on merge master to staging. Trying a automatic merge request: ')
-                api.get_merge_request_api().create_merge_request(git.get_current_url(), MASTER_BRANCH,
+                api.get_merge_request_api().create_merge_request(git.get_current_url(), self.CONFIG.master_branch,
                                                                  'Synchronization merge request {} to {}'.format(
-                                                                     MASTER_BRANCH,
-                                                                     STAGING_BRANCH),
+                                                                     self.CONFIG.master_branch,
+                                                                     self.CONFIG.staging_branch),
                                                                  'Don\'t remove this merge request before finish release',
                                                                  None,
-                                                                 STAGING_BRANCH, None)
+                                                                 self.CONFIG.staging_branch, None)
                 api.get_merge_request_api().validate_merge_request_by_url_and_branches(git.get_current_url(),
-                                                                                       MASTER_BRANCH,
-                                                                                       STAGING_BRANCH)
+                                                                                       self.CONFIG.master_branch,
+                                                                                       self.CONFIG.staging_branch)
 
             git.get_git_cmd().pull()
 
             new_version = self._update_version(Version.MINOR, True)
-            git.commit_and_push_update_message(STAGING_BRANCH, new_version)
+            git.commit_and_push_update_message(self.CONFIG.staging_branch, new_version)
 
         except RuntimeError as e:
             print('Error finishing release of {}: {}'.format(os.getcwd(), str(e)))
@@ -294,7 +296,7 @@ class Release:
             merge_requests.append(
                 api.get_merge_request_api().create_merge_request(git.get_current_url(), branch,
                                                                  'Release {} - ' + branch,
-                                                                 description, None, MASTER_BRANCH, None))
+                                                                 description, None, self.CONFIG.master_branch, None))
 
         return merge_requests
 

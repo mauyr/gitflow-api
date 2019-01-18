@@ -12,3 +12,21 @@ type = Slack
 post_updates = false
 release_webhook =
 launch_webhook =
+
+[PROPERTIES]
+master_branch = 'master'
+staging_branch = 'staging'
+
+hotfix_branch = 'hotfix/{}'
+feature_branch = 'feature/{}'
+release_branch = 'release/{}'
+
+version = '{}-{}'
+
+# Issue Classification - Api Labels
+features_labels = ['story', 'feature']
+change_labels = ['change']
+bug_labels = ['bug']
+technical_debt_labels = ['technical debt']
+ignore_labels = ['ignore']
+version_label_prefix = 'v.{}'

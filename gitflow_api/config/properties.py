@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 
 # Config file
-CONFIG_FILE = 'gitflow.config'
+CONFIG_FILE = 'gitflow.CONFIG'
 
 # Branches structure
-MASTER_BRANCH = 'master'
-STAGING_BRANCH = 'staging'
+DEFAULT_MASTER_BRANCH = 'master'
+DEFAULT_STAGING_BRANCH = 'staging'
 
-HOTFIX_BRANCH = 'hotfix/{}'
-FEATURE_BRANCH = 'feature/{}'
-RELEASE_BRANCH = 'release/{}'
+DEFAULT_HOTFIX_BRANCH = 'hotfix/{}'
+DEFAULT_FEATURE_BRANCH = 'feature/{}'
+DEFAULT_RELEASE_BRANCH = 'release/{}'
 
-VERSION = '{}-{}'
+DEFAULT_VERSION = '{}-{}'
 
 # Issue Classification - Api Labels
-FEATURE_LABELS = ['story', 'feature']
-CHANGE_LABELS = ['change']
-BUG_LABELS = ['bug']
-TECHNICAL_DEBT_LABELS = ['technical debt']
-IGNORE_LABELS = ['ignore']
-VERSION_LABEL_PREFIX = 'v.{}'
+DEFAULT_FEATURE_LABELS = ['story', 'feature']
+DEFAULT_CHANGE_LABELS = ['change']
+DEFAULT_BUG_LABELS = ['bug']
+DEFAULT_TECHNICAL_DEBT_LABELS = ['technical debt']
+DEFAULT_IGNORE_LABELS = ['ignore']
+DEFAULT_VERSION_LABEL_PREFIX = 'v.{}'

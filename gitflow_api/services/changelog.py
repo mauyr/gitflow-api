@@ -4,7 +4,7 @@
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
-from gitflow_api.config.properties import *
+from gitflow_api.config.config import Config
 from gitflow_api.utilities.git_helper import GitHelper
 from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
 from gitflow_api.utilities.version_utils import VersionUtils, Version
@@ -17,6 +17,8 @@ IGNORE_TYPE = 'ignore'
 
 
 class Changelog:
+
+    CONFIG = Config()
 
     def __init__(self):
         pass
@@ -68,14 +70,14 @@ class Changelog:
         actual_version = project_management.actual_version().replace('-SNAPSHOT', '')
         # ultima tag
         tag_commit = tags[0]
-        tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+        tag_version = str(tag_commit).replace(self.CONFIG.version.format(project_name, ''), '')
 
         if VersionUtils.extract_version(tag_version, Version.MAJOR) != VersionUtils.extract_version(
                 actual_version, Version.MAJOR):
             last_version = '{}.0.0'.format(VersionUtils.extract_version(actual_version, Version.MAJOR) - 1)
             for tag in tags:
                 tag_commit = tag
-                tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+                tag_version = str(tag_commit).replace(self.CONFIG.version.format(project_name, ''), '')
 
                 if VersionUtils.diff_version(tag_version, last_version) <= 0:
                     break
@@ -87,7 +89,7 @@ class Changelog:
                                                 VersionUtils.extract_version(actual_version, Version.MINOR) - 1)
                 for tag in tags:
                     tag_commit = tag
-                    tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+                    tag_version = str(tag_commit).replace(self.CONFIG.version.format(project_name, ''), '')
 
                     if VersionUtils.diff_version(tag_version, last_version) <= 0:
                         break
@@ -107,8 +109,8 @@ class Changelog:
 
                 merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(group_name, project_name, message)
 
-                add_changelog = merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1
-                add_changelog = add_changelog and (merge_request.target_branch == STAGING_BRANCH or not only_staging)
+                add_changelog = merge_request.source_branch.find(self.CONFIG.release_branch.format('')) == -1
+                add_changelog = add_changelog and (merge_request.target_branch == self.CONFIG.staging_branch or not only_staging)
                 if add_changelog:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels)
@@ -189,6 +191,9 @@ class ChangelogIssues:
 
 
 class Issue:
+
+    CONFIG = Config()
+
     title = ''
     url = ''
     issueType = ''
@@ -199,13 +204,13 @@ class Issue:
         self.issueType = self._getIssueType(labels)
 
     def _getIssueType(self, labels):
-        if len(list(filter(lambda x: str(x).find(VERSION_LABEL_PREFIX.format('')) == 0, labels))) > 0 or len(set(IGNORE_LABELS) & set(labels)) > 0:
+        if len(list(filter(lambda x: str(x).find(self.CONFIG.version_label_prefix.format('')) == 0, labels))) > 0 or len(set(self.CONFIG.ignore_labels) & set(labels)) > 0:
             return IGNORE_TYPE
-        elif len(set(FEATURE_LABELS) & set(labels)) > 0:
+        elif len(set(self.CONFIG.feature_labels) & set(labels)) > 0:
             return STORY_TYPE
-        elif len(set(BUG_LABELS) & set(labels)) > 0:
+        elif len(set(self.CONFIG.bug_labels) & set(labels)) > 0:
             return BUG_TYPE
-        elif len(set(TECHNICAL_DEBT_LABELS) & set(labels)) > 0:
+        elif len(set(self.CONFIG.technical_debt_labels) & set(labels)) > 0:
             return TECHNICAL_TYPE
         else:
             return OTHER_TYPE

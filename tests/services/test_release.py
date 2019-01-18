@@ -3,11 +3,10 @@
 
 import configparser
 import os
-from configparser import ConfigParser
 from unittest import TestCase
 from unittest.mock import patch
 
-from gitflow_api.config.properties import VERSION
+from gitflow_api.config.properties import DEFAULT_VERSION
 from gitflow_api.services.changelog import Changelog
 from gitflow_api.services.release import Release
 
@@ -21,7 +20,7 @@ class TestRelease(TestCase):
     @staticmethod
     def fake_read_config():
         config = configparser.ConfigParser()
-        config.read('mock/gitflow.config.mock')
+        config.read('services/mock/gitflow.CONFIG.mock')
         return config
 
     @patch.object(Changelog, 'create_changelog', fake_changelog)
@@ -33,7 +32,7 @@ class TestRelease(TestCase):
 
         #assertion
         config = TestRelease.fake_read_config()
-        filename = VERSION.format(project_name, version)
+        filename = DEFAULT_VERSION.format(project_name, version)
         path = config['CHANGELOG']['path']
         file = open(path + './' + filename, 'r')
         self.assertTrue(''.join(file.readlines()) == TestRelease.fake_changelog('branch'))
