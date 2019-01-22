@@ -6,12 +6,15 @@ from subprocess import check_call, check_output
 
 from git import Repo
 
+from gitflow_api.config.config import Config
 from gitflow_api.config.properties import CONFIG_FILE
 
 
 class GitHelper:
     global repo
     global path
+
+    config = Config()
 
     def __init__(self):
         self.data = []
@@ -115,10 +118,8 @@ class GitHelper:
 
     @staticmethod
     def get_api_url_from_config():
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        api_url = str(config['API']['url']).lower()
-        return api_url
+        config = Config()
+        return config.api_url
 
     def get_git_cmd(self):
         return self.repo.git

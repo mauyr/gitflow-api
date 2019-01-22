@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Config file
-CONFIG_FILE = 'gitflow.CONFIG'
+CONFIG_FILE = 'gitflow.config'
 
 # Branches structure
 DEFAULT_MASTER_BRANCH = 'master'

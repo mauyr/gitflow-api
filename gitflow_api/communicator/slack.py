@@ -22,28 +22,28 @@ class Slack(Communicator):
 
     @staticmethod
     def _make_changelog_slack_format(changelog_issues):
-        merge_request_md = ''
+        merge_request_slack_format = ''
         if len(changelog_issues.stories) > 0:
-            merge_request_md = merge_request_md + '\n' + str('*Improvements*')
+            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Improvements*')
             for issue in changelog_issues.stories:
-                merge_request_md = merge_request_md + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
 
         if len(changelog_issues.bugs) > 0:
-            merge_request_md = merge_request_md + '\n' + str('*Bugs*')
+            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Bugs*')
             for issue in changelog_issues.bugs:
-                merge_request_md = merge_request_md + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
 
         if len(changelog_issues.technicalDebts) > 0:
-            merge_request_md = merge_request_md + '\n' + str('*Technical Debts*')
+            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Technical Debts*')
             for issue in changelog_issues.technicalDebts:
-                merge_request_md = merge_request_md + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
 
         if len(changelog_issues.others) > 0:
-            merge_request_md = merge_request_md + '\n' + str('*Others*')
+            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Others*')
             for issue in changelog_issues.others:
-                merge_request_md = merge_request_md + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
 
-        return merge_request_md
+        return merge_request_slack_format
 
 
 class SlackPostMessage:
