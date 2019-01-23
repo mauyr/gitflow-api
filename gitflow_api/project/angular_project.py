@@ -30,6 +30,9 @@ class AngularProject(ProjectManager):
     def test(self):
         return
 
+    def deploy_local(self):
+        return
+    
     def deploy(self):
         return
 
