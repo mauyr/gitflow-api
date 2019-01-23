@@ -17,7 +17,7 @@ class Release:
     def __init__(self):
         pass
 
-    def release_start(self, force=False, skipTests=False):
+    def release_start(self, force=False, skip_tests=False):
         git = GitHelper()
 
         group_name, url_pattern = self._url_pattern_build(git)
@@ -32,7 +32,7 @@ class Release:
 
         # print(urlPattern)
         release_branch = self._get_config().release_branch.format(
-            self._recursive_release(initial_path, url_pattern, group_name, force, skipTests))
+            self._recursive_release(initial_path, url_pattern, group_name, force, skip_tests))
 
         self._create_merge_requests(initial_path, release_branch)
 
@@ -107,7 +107,7 @@ class Release:
 
         return new_version
 
-    def _recursive_release(self, actual_path, url_pattern, origin_group_name, force, skipTests):
+    def _recursive_release(self, actual_path, url_pattern, origin_group_name, force, skip_tests):
 
         project_management = ProjectManagerStrategy.get_instance(actual_path)
 
@@ -134,7 +134,7 @@ class Release:
 
                     dependency_project_manager.deploy()
                 except Exception as e:
-                    self._recursive_release(path, url_pattern, origin_group_name, force)
+                    self._recursive_release(path, url_pattern, origin_group_name, force, skip_tests)
 
         try:
             os.chdir(actual_path)
@@ -144,7 +144,7 @@ class Release:
 
             print('Starting release of {}'.format(os.getcwd()))
 
-            if not skipTests:
+            if not skip_tests:
                 project_management.test()
 
             release_branch = self._get_config().release_branch.format(release_version)
@@ -320,8 +320,8 @@ class Release:
         url[1] = '{}'
         url_pattern = '/'.join(url)
         return group_name, url_pattern
-    
-    
+
+
     def _get_config(self):
         if (self.config is None):
             self.config = Config()

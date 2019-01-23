@@ -34,7 +34,7 @@ def main():
     elif args.action.lower() == 'hotfix-finish':
         Hotfix().hotfix_finish(args)
     elif args.action.lower() == 'release-start':
-        Release().release_start(force=args.force, skipTests=args.skipTests)
+        Release().release_start(force=args.force, skip_tests=args.skipTests)
     elif args.action.lower() == 'release-finish':
         Release().release_finish(args)
     elif args.action.lower() == 'launch':

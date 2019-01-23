@@ -17,8 +17,8 @@ class Slack(Communicator):
         return requests.post(channel, json=json)
 
     def send_changelog(self, changelog, channel):
-        json = SlackPostMessage(self._make_changelog_slack_format(changelog), 'Gitflow-API').toJSON()
-        return requests.post(channel, json=json)
+        message = SlackPostMessage(self._make_changelog_slack_format(changelog), 'Gitflow-API').toJSON()
+        return requests.post(channel, data=message)
 
     @staticmethod
     def _make_changelog_slack_format(changelog_issues):
@@ -54,6 +54,7 @@ class SlackPostMessage:
     def __init__(self, text, username):
         self.text = text
         self.username = username
+        self.mrkdwn = True
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
