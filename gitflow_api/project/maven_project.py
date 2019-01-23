@@ -42,6 +42,9 @@ class MavenProject(ProjectManager):
         mvn_cmd = 'mvn -B clean test'
         check_call(mvn_cmd, shell=True)
 
+    def deploy_local(self):
+        self.deploy()
+
     def deploy(self):
         mvn_cmd = 'mvn -B deploy -DskipTests'
         check_call(mvn_cmd, shell=True)

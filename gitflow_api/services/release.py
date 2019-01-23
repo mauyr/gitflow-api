@@ -204,7 +204,7 @@ class Release:
             if not git.checkout_and_pull(release_branch):
                 git.create_new_branch_from(STAGING_BRANCH, release_branch)
 
-            project_management.deploy()
+            project_management.deploy_local()
 
             return release_version
         except RuntimeError as e:
