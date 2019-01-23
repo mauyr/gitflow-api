@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import os
 from enum import Enum
+
+from gitflow_api.config.config import Config
+from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
+from gitflow_api.utilities.git_helper import GitHelper
 
 
 class VersionUtils:
@@ -52,6 +56,23 @@ class VersionUtils:
             return int(splitted_version[len(splitted_version) - version_type.value])
         except Exception as e:
             return -1
+
+    @staticmethod
+    def adjust_versions():
+        config = Config()
+        project = ProjectManagerStrategy.get_instance(os.getcwd())
+
+        git = GitHelper()
+
+        git.checkout_and_pull(config.master_branch)
+        master_version = project.actual_version()
+
+        new_version = VersionUtils.get_new_version(master_version, Version.MINOR, True, 1)
+
+        git.checkout_and_pull(config.staging_branch)
+        project.update_version(new_version)
+
+        git.commit_and_push_update_message(config.staging_branch, new_version)
 
 
 class Version(Enum):

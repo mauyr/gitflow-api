@@ -6,6 +6,7 @@ from gitflow_api.services.feature import Feature
 from gitflow_api.services.hotfix import Hotfix
 from gitflow_api.services.release import Release
 from gitflow_api.services.changelog import Changelog
+from gitflow_api.utilities.version_utils import VersionUtils
 
 
 def main():
@@ -40,7 +41,10 @@ def main():
     elif args.action.lower() == 'launch':
         Release().launch()
     elif args.action.lower() == 'changelog':
-        print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag, only_staging=args.onlyStaging, write_changelog=args.writeChangelog))
+        print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag, only_staging=args.onlyStaging,
+                                                    write_changelog=args.writeChangelog))
+    elif args.action.lower() == 'adjust-versions':
+        VersionUtils.adjust_versions()
     else:
         print(
             'Action not found [feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
