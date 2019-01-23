@@ -14,12 +14,8 @@ class Api(object):
     global path
 
     def __init__(self, api_key, api_url):
-        if api_key is not None and api_url is not None:
-            self.api_key = api_key
-            self.api_url = api_url
-        else:
-            self.api_key = os.environ['GITFLOW_API_KEY']
-            self.api_url = os.environ['GITFLOW_API_URL']
+        self.api_key = api_key
+        self.api_url = api_url
 
         self.path = os.getcwd()
 

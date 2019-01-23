@@ -12,7 +12,7 @@ class TestPythonProject(TestCase):
 
     @staticmethod
     def get_correct_setup_file():
-        return 'mock/setup.py.mock'
+        return 'project/mock/setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_correct_setup_file)
     def test_actual_version_with_correct_setup(self):
@@ -22,7 +22,7 @@ class TestPythonProject(TestCase):
 
     @staticmethod
     def get_incorrect_version_setup_file():
-        return 'mock/incorrect_version_setup.py.mock'
+        return 'project/mock/incorrect_version_setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_incorrect_version_setup_file)
     def test_actual_version_with_incorrect_version_setup(self):
@@ -34,7 +34,7 @@ class TestPythonProject(TestCase):
 
     @staticmethod
     def get_incorrect_setup_file():
-        return 'mock/incorrect_setup.py.mock'
+        return 'project/mock/incorrect_setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_incorrect_setup_file)
     def test_actual_version_with_incorrect_setup(self):

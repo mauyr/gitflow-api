@@ -13,7 +13,7 @@ class TestAngularProject(TestCase):
 
     @staticmethod
     def get_correct_package_file():
-        return 'mock/package.json.mock'
+        return 'project/mock/package.json.mock'
 
     @patch.object(AngularProject, '_get_version_filename', get_correct_package_file)
     def test_actual_version_with_correct_setup(self):

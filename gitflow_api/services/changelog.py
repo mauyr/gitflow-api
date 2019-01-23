@@ -4,7 +4,7 @@
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
-from gitflow_api.config.properties import *
+from gitflow_api.config.config import Config
 from gitflow_api.utilities.git_helper import GitHelper
 from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
 from gitflow_api.utilities.version_utils import VersionUtils, Version
@@ -18,21 +18,46 @@ IGNORE_TYPE = 'ignore'
 
 class Changelog:
 
+    config = None
+
     def __init__(self):
         pass
 
-    def create_changelog(self, branch, from_tag=None, path=None, only_staging=None):
+    def create_changelog(self, branch, from_tag=None, path=None, only_staging=False):
         git = GitHelper()
         branch = str(git.get_current_branch() if branch is None else branch)
 
         return self._create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
-    def create_markdown_changelog(self, branch, from_tag=None, path=None, only_staging=None):
+    def create_markdown_changelog(self, branch, from_tag=None, path=None, only_staging=False, write_changelog=False):
         changelog_issues = self.create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
-        return self.make_changelog_md(changelog_issues)
+        changelog_md = self.make_changelog_md(changelog_issues)
 
-    def _create_changelog(self, branch, from_tag=None, path=None, only_staging=None):
+        if write_changelog:
+            self.write_changelog(changelog_md)
+
+        return changelog_md
+
+    def write_changelog(self, changelog_md):
+        if bool(self._get_config().changelog_create_file):
+            git = GitHelper()
+            group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
+
+            project = ProjectManagerStrategy().get_instance(os.path)
+            version = project.actual_version()
+
+            filename = self._get_config().version.format(project_name, version)
+
+            path = self._get_config().changelog_path
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+            release_notes = open(path + './' + filename, 'w')
+            release_notes.write(changelog_md)
+            release_notes.close()
+
+    def _create_changelog(self, branch, from_tag=None, path=None, only_staging=False):
 
         if path is not None:
             os.chdir(path)
@@ -68,14 +93,14 @@ class Changelog:
         actual_version = project_management.actual_version().replace('-SNAPSHOT', '')
         # ultima tag
         tag_commit = tags[0]
-        tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+        tag_version = str(tag_commit).replace(self._get_config().version.format(project_name, ''), '')
 
         if VersionUtils.extract_version(tag_version, Version.MAJOR) != VersionUtils.extract_version(
                 actual_version, Version.MAJOR):
             last_version = '{}.0.0'.format(VersionUtils.extract_version(actual_version, Version.MAJOR) - 1)
             for tag in tags:
                 tag_commit = tag
-                tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+                tag_version = str(tag_commit).replace(self._get_config().version.format(project_name, ''), '')
 
                 if VersionUtils.diff_version(tag_version, last_version) <= 0:
                     break
@@ -87,7 +112,7 @@ class Changelog:
                                                 VersionUtils.extract_version(actual_version, Version.MINOR) - 1)
                 for tag in tags:
                     tag_commit = tag
-                    tag_version = str(tag_commit).replace(VERSION.format(project_name, ''), '')
+                    tag_version = str(tag_commit).replace(self._get_config().version.format(project_name, ''), '')
 
                     if VersionUtils.diff_version(tag_version, last_version) <= 0:
                         break
@@ -107,8 +132,8 @@ class Changelog:
 
                 merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(group_name, project_name, message)
 
-                add_changelog = merge_request.source_branch.find(RELEASE_BRANCH.format('')) == -1
-                add_changelog = add_changelog and (merge_request.target_branch == STAGING_BRANCH or not only_staging)
+                add_changelog = merge_request.source_branch.find(self._get_config().release_branch.format('')) == -1
+                add_changelog = add_changelog and (merge_request.target_branch == self._get_config().staging_branch or not only_staging)
                 if add_changelog:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels)
@@ -177,6 +202,11 @@ class Changelog:
 
         return merge_request_md
 
+    def _get_config(self):
+        if (self.config is None):
+            self.config = Config()
+
+        return self.config
 
 class ChangelogIssues:
     stories = []
@@ -189,6 +219,8 @@ class ChangelogIssues:
 
 
 class Issue:
+    config = None
+
     title = ''
     url = ''
     issueType = ''
@@ -199,17 +231,22 @@ class Issue:
         self.issueType = self._getIssueType(labels)
 
     def _getIssueType(self, labels):
-        if len(list(filter(lambda x: str(x).find(VERSION_LABEL_PREFIX.format('')) == 0, labels))) > 0 or len(set(IGNORE_LABELS) & set(labels)) > 0:
+        if len(list(filter(lambda x: str(x).find(self._get_config().version_label_prefix.format('')) == 0, labels))) > 0 or len(set(self._get_config().ignore_labels) & set(labels)) > 0:
             return IGNORE_TYPE
-        elif len(set(FEATURE_LABELS) & set(labels)) > 0:
+        elif len(set(self._get_config().feature_labels) & set(labels)) > 0:
             return STORY_TYPE
-        elif len(set(BUG_LABELS) & set(labels)) > 0:
+        elif len(set(self._get_config().bug_labels) & set(labels)) > 0:
             return BUG_TYPE
-        elif len(set(TECHNICAL_DEBT_LABELS) & set(labels)) > 0:
+        elif len(set(self._get_config().technical_debt_labels) & set(labels)) > 0:
             return TECHNICAL_TYPE
         else:
             return OTHER_TYPE
 
+    def _get_config(self):
+        if (self.config is None):
+            self.config = Config()
+
+        return self.config
 
 class Commit:
     commit = ''
