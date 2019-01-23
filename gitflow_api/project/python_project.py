@@ -57,6 +57,9 @@ class PythonProject(ProjectManager):
         #python -m unittest discover -s tests
         pass
 
+    def deploy_local(self):
+        pass
+
     def deploy(self):
         #remove dist and build files
         shutil.rmtree('dist')

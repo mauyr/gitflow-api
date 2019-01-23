@@ -33,6 +33,10 @@ class ProjectManager(object):
         pass
 
     @abc.abstractmethod
+    def deploy_local(self):
+        pass
+
+    @abc.abstractmethod
     def deploy(self):
         pass
 
