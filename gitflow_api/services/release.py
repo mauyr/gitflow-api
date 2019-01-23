@@ -67,8 +67,8 @@ class Release:
         group_name, project_name = git.extract_group_and_project()
 
         try:
-            changelog = self._create_and_write_changelog()
-            self._post_changelog(changelog, 'launch')
+            changelog_issues = self._create_and_write_changelog()
+            self._post_changelog(changelog_issues, 'launch')
         except Exception as e:
             print("Fail to create changelog", e)
 
@@ -85,7 +85,7 @@ class Release:
         changelog = Changelog()
         changelog_issues = Changelog().create_changelog(self._get_config().master_branch)
 
-        changelog.write_changelog(Changelog.make_changelog_md(changelog_issues))
+        changelog.write_changelog(changelog_issues)
 
         return changelog_issues
 

@@ -50,6 +50,7 @@ class Config:
         self._set_properties()
         self._set_api_config()
         self._set_communicator_config()
+        self._set_changelog_config()
 
     # Method for mock tests
     def get_config_file(self):
