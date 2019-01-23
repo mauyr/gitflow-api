@@ -25,7 +25,7 @@ class AngularProject(ProjectManager):
             return AngularProject._write_new_version(data, AngularProject._get_version_filename())
 
     def dependencies(self):
-        return
+        return []
 
     def test(self):
         return

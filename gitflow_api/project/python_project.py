@@ -51,7 +51,7 @@ class PythonProject(ProjectManager):
         return lines
 
     def dependencies(self):
-        return
+        return []
 
     def test(self):
         #python -m unittest discover -s tests
