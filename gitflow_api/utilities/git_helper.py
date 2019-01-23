@@ -2,16 +2,19 @@
 # encoding: utf-8
 import configparser
 import os
-from subprocess import check_call
+from subprocess import check_call, check_output
 
 from git import Repo
 
+from gitflow_api.config.config import Config
 from gitflow_api.config.properties import CONFIG_FILE
 
 
 class GitHelper:
     global repo
     global path
+
+    config = Config()
 
     def __init__(self):
         self.data = []
@@ -81,6 +84,9 @@ class GitHelper:
             git_cmd = 'git merge --no-commit {}'
             check_call(git_cmd.format(from_branch), shell=True)
 
+            git_cmd = 'git commit -m "{}"'
+            check_call(git_cmd.format('Automatic merge maked by gitflow-api'), shell=True)
+
             self.push_branch(to_branch)
         except Exception:
             git_cmd = 'git reset HEAD --hard'
@@ -89,6 +95,10 @@ class GitHelper:
             group_name, project_name = self.extract_group_and_project()
 
             raise RuntimeError('Project {} has conflict from branch {} into {}'.format(project_name, from_branch, to_branch))
+
+    def check_branch_exists_on_remote(self, branch):
+        git_cmd = 'git ls-remote --heads origin {} | wc -l'
+        return int(check_output(git_cmd.format(branch), shell=True).decode('UTF-8'))
 
     def extract_group_and_project(self):
         return GitHelper.extract_group_and_project_from_url(self.get_current_url())
@@ -108,10 +118,8 @@ class GitHelper:
 
     @staticmethod
     def get_api_url_from_config():
-        config = configparser.ConfigParser()
-        config.read(CONFIG_FILE)
-        api_url = str(config['API']['url']).lower()
-        return api_url
+        config = Config()
+        return config.api_url
 
     def get_git_cmd(self):
         return self.repo.git

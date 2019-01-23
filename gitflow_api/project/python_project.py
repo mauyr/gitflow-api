@@ -23,7 +23,7 @@ class PythonProject(ProjectManager):
         for line in lines:
             if str(line).lower().find('version=') >= 0:
                 version = re.search('(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)', str(line))
-                if version is None:
+                if version is None or len(str(version.group(0)).split('.')) != 3:
                     raise ValueError('Version has incorrect format')
                 return version.group(0)
 
@@ -36,7 +36,7 @@ class PythonProject(ProjectManager):
         while i < len(lines):
             version_position = str(lines[i]).lower().find('version="')
             if version_position >= 0:
-                lines[i] = lines[i][:version_position+9] + str(version) + '",\n'
+                lines[i] = lines[i][:version_position + 9] + str(version) + '",\n'
 
             i += 1
 
@@ -54,14 +54,14 @@ class PythonProject(ProjectManager):
         return []
 
     def test(self):
-        #python -m unittest discover -s tests
+        # python -m unittest discover -s tests
         pass
 
     def deploy_local(self):
         pass
 
     def deploy(self):
-        #remove dist and build files
+        # remove dist and build files
         shutil.rmtree('dist')
         shutil.rmtree('build')
 

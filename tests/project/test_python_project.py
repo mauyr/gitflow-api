@@ -12,34 +12,34 @@ class TestPythonProject(TestCase):
 
     @staticmethod
     def get_correct_setup_file():
-        return 'mock/setup.py.mock'
+        return 'project/mock/setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_correct_setup_file)
     def test_actual_version_with_correct_setup(self):
-        python_project = PythonProject(os.path)
+        python_project = PythonProject(os.getcwd())
         actual_version = python_project.actual_version()
         self.assertEqual(actual_version, '1.0.0')
 
     @staticmethod
     def get_incorrect_version_setup_file():
-        return 'mock/incorrect_version_setup.py.mock'
+        return 'project/mock/incorrect_version_setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_incorrect_version_setup_file)
     def test_actual_version_with_incorrect_version_setup(self):
         with self.assertRaises(ValueError) as context:
-            python_project = PythonProject(os.path)
+            python_project = PythonProject(os.getcwd())
             python_project.actual_version()
 
         self.assertTrue('Version has incorrect format' in context.exception.args)
 
     @staticmethod
     def get_incorrect_setup_file():
-        return 'mock/incorrect_setup.py.mock'
+        return 'project/mock/incorrect_setup.py.mock'
 
     @patch.object(PythonProject, '_get_version_filename', get_incorrect_setup_file)
     def test_actual_version_with_incorrect_setup(self):
         with self.assertRaises(ValueError) as context:
-            python_project = PythonProject(os.path)
+            python_project = PythonProject(os.getcwd())
             python_project.actual_version()
 
         self.assertTrue('Version tag not found' in context.exception.args)
