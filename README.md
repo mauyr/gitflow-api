@@ -38,12 +38,12 @@ If you like to clone from source, you can do it like so:
 ## Usability
 
 ### Hotfix
-`gitflow hotfix-start --branch=hotfix-branch-1`
+`gitflow hotfix-start hotfix-branch-1`
 
 `gitflow hotfix-finish` 
 
 ### Features
-`gitflow feature-start --branch=feature-branch-1`
+`gitflow feature-start feature-branch-1`
 
 `gitflow feature-finish`
 
