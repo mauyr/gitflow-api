@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import json
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
@@ -17,7 +17,6 @@ IGNORE_TYPE = 'ignore'
 
 
 class Changelog:
-
     config = None
 
     def __init__(self):
@@ -35,16 +34,16 @@ class Changelog:
         changelog_md = self.make_changelog_md(changelog_issues)
 
         if write_changelog:
-            self.write_changelog(changelog_md)
+            self.write_changelog(changelog_issues)
 
         return changelog_md
 
-    def write_changelog(self, changelog_md):
+    def write_changelog(self, changelog_issues):
         if bool(self._get_config().changelog_create_file):
             git = GitHelper()
             group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
 
-            project = ProjectManagerStrategy().get_instance(os.path)
+            project = ProjectManagerStrategy().get_instance(os.getcwd())
             version = project.actual_version()
 
             filename = self._get_config().version.format(project_name, version)
@@ -53,8 +52,11 @@ class Changelog:
             if not os.path.exists(path):
                 os.makedirs(path)
 
-            release_notes = open(path + './' + filename, 'w')
-            release_notes.write(changelog_md)
+            changelog_issues.version = version
+            changelog_json = json.dumps(changelog_issues, sort_keys=True, indent=4, cls=ComplexEncoder, ensure_ascii=False)
+
+            release_notes = open(path + './' + filename, 'w', encoding='utf8')
+            release_notes.write(changelog_json)
             release_notes.close()
 
     def _create_changelog(self, branch, from_tag=None, path=None, only_staging=False):
@@ -130,13 +132,15 @@ class Changelog:
             message = commit.message
             if message.find('See merge request') >= 0:
 
-                merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(group_name, project_name, message)
+                merge_request = api.get_merge_request_api().find_merge_request_by_commit_message(group_name,
+                                                                                                 project_name, message)
 
                 add_changelog = merge_request.source_branch.find(self._get_config().release_branch.format('')) == -1
-                add_changelog = add_changelog and (merge_request.target_branch == self._get_config().staging_branch or not only_staging)
+                add_changelog = add_changelog and (
+                        merge_request.target_branch == self._get_config().staging_branch or not only_staging)
                 if add_changelog:
                     issue = Issue(merge_request.title, merge_request.web_url,
-                                  merge_request.labels)
+                                  merge_request.labels, self._get_config())
                     self._add_change_log_issue(changelog_issues, issue)
 
             # ignore some commits
@@ -208,7 +212,9 @@ class Changelog:
 
         return self.config
 
+
 class ChangelogIssues:
+    version = '0.0.0'
     stories = []
     bugs = []
     technicalDebts = []
@@ -217,36 +223,36 @@ class ChangelogIssues:
     def __init__(self):
         pass
 
+    def toJSON(self):
+        return dict(version=self.version, stories=self.stories, bugs=self.bugs, technicalDebts=self.technicalDebts, others=self.others)
+
 
 class Issue:
-    config = None
-
     title = ''
     url = ''
     issueType = ''
 
-    def __init__(self, title, url, labels):
+    def __init__(self, title, url, labels, config):
         self.title = str(title)
         self.url = str(url)
-        self.issueType = self._getIssueType(labels)
+        self.issueType = self._getIssueType(labels, config)
 
-    def _getIssueType(self, labels):
-        if len(list(filter(lambda x: str(x).find(self._get_config().version_label_prefix.format('')) == 0, labels))) > 0 or len(set(self._get_config().ignore_labels) & set(labels)) > 0:
+    def _getIssueType(self, labels, config):
+        if len(list(filter(lambda x: str(x).find(config.version_label_prefix.format('')) == 0,
+                           labels))) > 0 or len(set(config.ignore_labels) & set(labels)) > 0:
             return IGNORE_TYPE
-        elif len(set(self._get_config().feature_labels) & set(labels)) > 0:
+        elif len(set(config.feature_labels) & set(labels)) > 0:
             return STORY_TYPE
-        elif len(set(self._get_config().bug_labels) & set(labels)) > 0:
+        elif len(set(config.bug_labels) & set(labels)) > 0:
             return BUG_TYPE
-        elif len(set(self._get_config().technical_debt_labels) & set(labels)) > 0:
+        elif len(set(config.technical_debt_labels) & set(labels)) > 0:
             return TECHNICAL_TYPE
         else:
             return OTHER_TYPE
 
-    def _get_config(self):
-        if (self.config is None):
-            self.config = Config()
+    def toJSON(self):
+        return dict(title=self.title, url=self.url, issueType=self.issueType)
 
-        return self.config
 
 class Commit:
     commit = ''
@@ -256,3 +262,11 @@ class Commit:
 
     def __init__(self):
         pass
+
+
+class ComplexEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'toJSON'):
+            return obj.toJSON()
+        else:
+            return json.JSONEncoder.default(self, obj)
