@@ -14,7 +14,7 @@ def main():
 
     parser.add_argument('action', type=str,
                         help='Actions: feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
-                             'release-finish, launch, changelog')
+                             'release-finish, launch, changelog, adjust-versions')
     parser.add_argument('--branch', help='Branch name')
     parser.add_argument('--title', help='Title description of feature or hotfix')
     parser.add_argument('--issue', help='Issue ID on GitLab')
@@ -48,7 +48,7 @@ def main():
     else:
         print(
             'Action not found [feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
-            'release-finish, launch, changelog]')
+            'release-finish, launch, changelog, adjust-versions]')
 
 
 if __name__ == '__main__':
