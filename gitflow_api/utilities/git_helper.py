@@ -2,7 +2,7 @@
 # encoding: utf-8
 import configparser
 import os
-from subprocess import check_call, check_output
+from subprocess import check_call, check_output, call
 
 from git import Repo
 
@@ -62,7 +62,7 @@ class GitHelper:
             check_call(git_cmd, shell=True)
 
             git_cmd = 'git commit -m "Update to next version {}"'
-            check_call(git_cmd.format(version), shell=True)
+            call(git_cmd.format(version), shell=True)
         except Exception as e:
             print('Nothing to commmit. Skipping.')
             return
