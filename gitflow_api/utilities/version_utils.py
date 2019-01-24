@@ -67,7 +67,9 @@ class VersionUtils:
         git.checkout_and_pull(config.master_branch)
         master_version = project.actual_version()
 
-        new_version = VersionUtils.get_new_version(master_version, Version.MINOR, True, 1)
+        incremented_version = VersionUtils.get_new_version(master_version, Version.MINOR, True, 1)
+
+        new_version = '{}.{}.0'.format(VersionUtils.extract_version(incremented_version, Version.MAJOR), VersionUtils.extract_version(incremented_version, Version.MINOR))
 
         git.checkout_and_pull(config.staging_branch)
         project.update_version(new_version)

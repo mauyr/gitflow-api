@@ -3,6 +3,8 @@
 
 from subprocess import check_call, run
 
+from gitflow_api.deploy.deploy_strategy import DeployStrategy
+from gitflow_api.deploy.pypi import Pypi
 from gitflow_api.project.project_manager import ProjectManager
 
 import re
@@ -61,15 +63,7 @@ class PythonProject(ProjectManager):
         pass
 
     def deploy(self):
-        # remove dist and build files
-        shutil.rmtree('dist')
-        shutil.rmtree('build')
-
-        cmd = 'python setup.py sdist bdist_wheel'
-        check_call(cmd, shell=True)
-
-        cmd = 'twine upload dist/*'
-        check_call(cmd, shell=True)
+        DeployStrategy.get_instance(default_deploy_class='Pypi').deploy()
 
     @staticmethod
     def _get_version_filename():
