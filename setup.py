@@ -13,7 +13,7 @@ test_requires = []
 
 setup(
     name="gitflow-api",
-    version="0.3.0-SNAPSHOT",
+    version="0.4.0-SNAPSHOT",
     description="Gitflow-API library using a API as backend",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
