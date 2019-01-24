@@ -92,7 +92,7 @@ class GitHelper:
             check_call(git_cmd.format(from_branch), shell=True)
 
             git_cmd = 'git commit -m "{}"'
-            check_call(git_cmd.format('Automatic merge maked by gitflow-api'), shell=True)
+            call(git_cmd.format('Automatic merge maked by gitflow-api'), shell=True)
 
             self.push_branch(to_branch)
         except Exception:
