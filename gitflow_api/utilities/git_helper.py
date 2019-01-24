@@ -79,6 +79,13 @@ class GitHelper:
 
         self.push_branch(tag)
 
+    def delete_tag(self, tag):
+        git_cmd = 'git push --delete origin {}'
+        check_call(git_cmd.format(tag), shell=True)
+
+        git_cmd = 'git tag -d {}'
+        check_call(git_cmd.format(tag), shell=True)
+
     def check_conflicts(self, from_branch, to_branch):
         try:
             git_cmd = 'git merge --no-commit {}'

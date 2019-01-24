@@ -1,0 +1,38 @@
+{
+    "bugs": [],
+    "others": [],
+    "stories": [
+        {
+            "issueType": "story",
+            "title": "Change branch to use like a second argument",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/12"
+        },
+        {
+            "issueType": "story",
+            "title": "Feature to adjust master and staging versions",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/11"
+        },
+        {
+            "issueType": "story",
+            "title": "WIP: feature/github-integration",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/1"
+        },
+        {
+            "issueType": "story",
+            "title": "Create a changelog file in a JSON format",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/7"
+        },
+        {
+            "issueType": "story",
+            "title": "Componente de configuração centralizada",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/6"
+        },
+        {
+            "issueType": "story",
+            "title": "Finalização de release recursiva usando as dependências",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/3"
+        }
+    ],
+    "technicalDebts": [],
+    "version": "0.2.0"
+}

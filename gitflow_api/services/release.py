@@ -49,7 +49,7 @@ class Release:
 
         self._recursive_finish_release(path, branch, url_pattern, group_name)
 
-    def launch(self):
+    def launch(self, force=False):
         git = GitHelper()
         git.checkout_and_pull(self._get_config().master_branch)
 
@@ -57,6 +57,13 @@ class Release:
         project_management = ProjectManagerStrategy.get_instance(path)
 
         version = project_management.actual_version().replace('-SNAPSHOT', '')
+        group_name, project_name = git.extract_group_and_project()
+
+        if force:
+            try:
+                git.delete_tag('{}-{}'.format(project_name, version))
+            except Exception as e:
+                pass
 
         # TODO: Criar rotinas para release recursivos e verificar se todas as dependencias nao estao mais em snapshot
         project_management.update_version(version)
@@ -64,11 +71,9 @@ class Release:
 
         git.commit_and_push_update_message(self._get_config().master_branch, version)
 
-        group_name, project_name = git.extract_group_and_project()
-
         try:
             changelog_issues = self._create_and_write_changelog()
-            self._post_changelog(changelog_issues, 'launch')
+            self._post_changelog(changelog_issues, 'launch', project_name)
         except Exception as e:
             print("Fail to create changelog", e)
 
@@ -89,12 +94,12 @@ class Release:
 
         return changelog_issues
 
-    def _post_changelog(self, changelog, channel):
+    def _post_changelog(self, changelog, channel, project_name):
         communicator = CommunicatorStrategy.get_instance()
         if channel == 'release':
-            communicator.send_changelog(changelog, communicator.release_webhook)
+            communicator.send_changelog(changelog, communicator.release_webhook, project_name)
         else:
-            communicator.send_changelog(changelog, communicator.launch_webhook)
+            communicator.send_changelog(changelog, communicator.launch_webhook, project_name)
 
     def _update_version(self, version_update, is_snapshot):
         path = os.getcwd()
@@ -268,9 +273,11 @@ class Release:
             for createdMergeRequests in merge_requests:
                 description = description + '* ' + createdMergeRequests.web_url + '\n'
 
+            group_name, project_name = git.extract_group_and_project_from_url(git.get_current_url())
+
             changelog = Changelog().create_changelog(branch, path=actual_path, only_staging=True)
             try:
-                self._post_changelog(changelog, 'release')
+                self._post_changelog(changelog, 'release', project_name)
             except Exception:
                 pass
 

@@ -15,7 +15,7 @@ def main():
     parser.add_argument('action', type=str,
                         help='Actions: feature-start, feature-finish, hotfix-start, hotfix-finish, release-start, '
                              'release-finish, launch, changelog, adjust-versions')
-    parser.add_argument('branch', type=str, help='Branch name')
+    parser.add_argument('branch', type=str, nargs='?', const=None, help='Branch name')
     parser.add_argument('--title', help='Title description of feature or hotfix')
     parser.add_argument('--issue', help='Issue ID on GitLab')
     parser.add_argument('--fromTag', help='Initial tag for changelog comparing')
@@ -39,7 +39,7 @@ def main():
     elif args.action.lower() == 'release-finish':
         Release().release_finish(args)
     elif args.action.lower() == 'launch':
-        Release().launch()
+        Release().launch(force=args.force)
     elif args.action.lower() == 'changelog':
         print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag, only_staging=args.onlyStaging,
                                                     write_changelog=args.writeChangelog))

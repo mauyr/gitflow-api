@@ -11,39 +11,40 @@ class Slack(Communicator):
     def __init__(self, release_webhook, launch_webhook):
         super(Slack, self).__init__(release_webhook, launch_webhook)
 
-    def send_message(self, message, channel):
+    def send_message(self, message, channel, project_name):
         json = SlackPostMessage(message, 'Gitflow-API').toJSON()
         r = requests.post(channel, json=json)
         return requests.post(channel, json=json)
 
-    def send_changelog(self, changelog, channel):
-        message = SlackPostMessage(self._make_changelog_slack_format(changelog), 'Gitflow-API').toJSON()
+    def send_changelog(self, changelog, channel, project_name):
+        message = SlackPostMessage(self._make_changelog_slack_format(changelog, project_name), 'Gitflow-API').toJSON()
         return requests.post(channel, data=message)
 
     @staticmethod
-    def _make_changelog_slack_format(changelog_issues):
-        merge_request_slack_format = ''
+    def _make_changelog_slack_format(changelog_issues, project_name):
+        slack_format_changelog = []
+        slack_format_changelog.append('*{} - {}*'.format(project_name, changelog_issues.version))
         if len(changelog_issues.stories) > 0:
-            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Improvements*')
+            slack_format_changelog.append(str('*Improvements*'))
             for issue in changelog_issues.stories:
-                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                slack_format_changelog.append(str('- <{}|{}>').format(issue.url, issue.title))
 
         if len(changelog_issues.bugs) > 0:
-            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Bugs*')
+            slack_format_changelog.append(str('*Bugs*'))
             for issue in changelog_issues.bugs:
-                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                slack_format_changelog.append(str('- <{}|{}>').format(issue.url, issue.title))
 
         if len(changelog_issues.technicalDebts) > 0:
-            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Technical Debts*')
+            slack_format_changelog.append(str('*Technical Debts*'))
             for issue in changelog_issues.technicalDebts:
-                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                slack_format_changelog.append(str('- <{}|{}>').format(issue.url, issue.title))
 
         if len(changelog_issues.others) > 0:
-            merge_request_slack_format = merge_request_slack_format + '\n' + str('*Others*')
+            slack_format_changelog.append(str('*Others*'))
             for issue in changelog_issues.others:
-                merge_request_slack_format = merge_request_slack_format + '\n' + str('- <{}|{}>').format(issue.url, issue.title)
+                slack_format_changelog.append(str('- <{}|{}>').format(issue.url, issue.title))
 
-        return merge_request_slack_format
+        return '\n'.join(slack_format_changelog)
 
 
 class SlackPostMessage:
