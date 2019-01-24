@@ -138,6 +138,7 @@ class Changelog:
                 add_changelog = merge_request.source_branch.find(self._get_config().release_branch.format('')) == -1
                 add_changelog = add_changelog and (
                         merge_request.target_branch == self._get_config().staging_branch or not only_staging)
+                add_changelog = add_changelog and merge_request.state == 'merged'
                 if add_changelog:
                     issue = Issue(merge_request.title, merge_request.web_url,
                                   merge_request.labels, self._get_config())
