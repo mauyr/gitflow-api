@@ -22,18 +22,19 @@ class TestCommunicator(TestCase):
 
     @staticmethod
     def fake_changelog():
-        stories = [Issue('Story 1 - Fake screen for fake app', 'http://127.0.0.1', 'story'),
-                   Issue('Story 2 - Fake feature with fake button', 'http://127.0.0.1', 'story')]
-        bugs = [Issue('Bug 1 - Fake bug fixed', 'http://127.0.0.1', 'bug')]
+        stories = [Issue('Story 1 - Fake screen for fake app', 'http://127.0.0.1', 'story', TestCommunicator.fake_config()),
+                   Issue('Story 2 - Fake feature with fake button', 'http://127.0.0.1', 'story', TestCommunicator.fake_config())]
+        bugs = [Issue('Bug 1 - Fake bug fixed', 'http://127.0.0.1', 'bug', TestCommunicator.fake_config())]
         changelog = ChangelogIssues()
         changelog.stories = stories
         changelog.bugs = bugs
+        changelog.version = '1.0.0'
         return changelog
 
     @patch.object(Changelog, '_get_config', fake_config)
     def test_make_changelog_slack_format(self):
-        slack_message = Slack._make_changelog_slack_format(TestCommunicator.fake_changelog())
-        self.assertEqual(slack_message, '\n*Improvements*\n- <http://127.0.0.1|Story 1 - Fake screen for fake app>\n- <http://127.0.0.1|Story 2 - Fake feature with fake button>\n*Bugs*\n- <http://127.0.0.1|Bug 1 - Fake bug fixed>')
+        slack_message = Slack._make_changelog_slack_format(TestCommunicator.fake_changelog(), 'Fake Project')
+        self.assertEqual(slack_message, '*Fake Project - 1.0.0*\n*Improvements*\n- <http://127.0.0.1|Story 1 - Fake screen for fake app>\n- <http://127.0.0.1|Story 2 - Fake feature with fake button>\n*Bugs*\n- <http://127.0.0.1|Bug 1 - Fake bug fixed>')
 
     @patch.object(CommunicatorStrategy, '_get_config', fake_config)
     def test_get_slack_instance(self):
