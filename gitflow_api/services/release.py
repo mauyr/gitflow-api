@@ -49,7 +49,7 @@ class Release:
 
         self._recursive_finish_release(path, branch, url_pattern, group_name)
 
-    def launch(self):
+    def launch(self, force=False):
         git = GitHelper()
         git.checkout_and_pull(self._get_config().master_branch)
 
@@ -57,14 +57,19 @@ class Release:
         project_management = ProjectManagerStrategy.get_instance(path)
 
         version = project_management.actual_version().replace('-SNAPSHOT', '')
+        group_name, project_name = git.extract_group_and_project()
+
+        if force:
+            try:
+                git.delete_tag('{}-{}'.format(project_name, version))
+            except Exception as e:
+                pass
 
         # TODO: Criar rotinas para release recursivos e verificar se todas as dependencias nao estao mais em snapshot
         project_management.update_version(version)
         project_management.update_dependencies_version()
 
         git.commit_and_push_update_message(self._get_config().master_branch, version)
-
-        group_name, project_name = git.extract_group_and_project()
 
         try:
             changelog_issues = self._create_and_write_changelog()

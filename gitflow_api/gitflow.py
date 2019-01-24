@@ -39,7 +39,7 @@ def main():
     elif args.action.lower() == 'release-finish':
         Release().release_finish(args)
     elif args.action.lower() == 'launch':
-        Release().launch()
+        Release().launch(force=args.force)
     elif args.action.lower() == 'changelog':
         print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag, only_staging=args.onlyStaging,
                                                     write_changelog=args.writeChangelog))
