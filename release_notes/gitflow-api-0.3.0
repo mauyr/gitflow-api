@@ -1,0 +1,35 @@
+{
+    "bugs": [
+        {
+            "issueType": "bug",
+            "title": "Adjust versions increment without zero patch number",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/22"
+        },
+        {
+            "issueType": "bug",
+            "title": "Changelog deve considerar somente merge requests reintegrados",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/18"
+        },
+        {
+            "issueType": "bug",
+            "title": "Segundo argumento está obrigatório para todas as ações",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/15"
+        }
+    ],
+    "others": [
+        {
+            "issueType": "other",
+            "title": "Adiciona versão e nome do projeto ao changelog enviado para o slack",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/17"
+        }
+    ],
+    "stories": [
+        {
+            "issueType": "story",
+            "title": "Deploy extension module",
+            "url": "https://git.reservafacil.tur.br/acme/infrastructure/gitflow-api/merge_requests/21"
+        }
+    ],
+    "technicalDebts": [],
+    "version": "0.3.0"
+}
