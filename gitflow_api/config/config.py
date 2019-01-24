@@ -40,6 +40,9 @@ class Config:
     changelog_create_file = False
     changelog_path = ''
 
+    # Extension
+    extension_deploy_class = None
+
     # Config file instance
     config_file = None
 
@@ -83,6 +86,9 @@ class Config:
         self.communicator_type = str(self._get_config_or_environment('COMMUNICATOR', 'type', 'GITFLOW_COMMUNICATOR_TYPE', 'None')).lower()
         self.communicator_release_webhook = str(self._get_config_or_environment('COMMUNICATOR', 'release_webhook', 'GITFLOW_COMMUNICATOR_RELEASE', ''))
         self.communicator_launch_webhook = str(self._get_config_or_environment('COMMUNICATOR', 'launch_webhook', 'GITFLOW_COMMUNICATOR_LAUNCH', ''))
+
+    def _set_extension(self):
+        self.extension_deploy_class = self._get_property('EXTENSION', 'deploy_class', None)
 
     def _get_config_or_environment(self, group, api_config, os_environment, default_value):
         try:

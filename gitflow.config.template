@@ -30,3 +30,6 @@ bug_labels = ['bug']
 technical_debt_labels = ['technical debt']
 ignore_labels = ['ignore']
 version_label_prefix = 'v.{}'
+
+[EXTENSION]
+deploy_class = Pypi

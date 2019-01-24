@@ -3,6 +3,7 @@
 
 from subprocess import check_call
 
+from gitflow_api.deploy.deploy_strategy import DeployStrategy
 from gitflow_api.project.project_manager import ProjectManager, Dependency
 
 from xml.etree import ElementTree
@@ -43,11 +44,11 @@ class MavenProject(ProjectManager):
         check_call(mvn_cmd, shell=True)
 
     def deploy_local(self):
-        self.deploy()
-
-    def deploy(self):
         mvn_cmd = 'mvn -B deploy -DskipTests'
         check_call(mvn_cmd, shell=True)
+
+    def deploy(self):
+        DeployStrategy.get_instance(default_deploy_class='Maven').deploy()
 
     def _get_dependencies_from_path(self):
         tree = ElementTree.parse(self.path + "/" + "pom.xml")
