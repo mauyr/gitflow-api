@@ -43,16 +43,12 @@ class Changelog:
             git = GitHelper()
             group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
 
-            project = ProjectManagerStrategy().get_instance(os.getcwd())
-            version = project.actual_version()
-
             filename = self._get_config().version.format(project_name, version)
 
             path = self._get_config().changelog_path
             if not os.path.exists(path):
                 os.makedirs(path)
 
-            changelog_issues.version = version
             changelog_json = json.dumps(changelog_issues, sort_keys=True, indent=4, cls=ComplexEncoder, ensure_ascii=False)
 
             release_notes = open(path + './' + filename, 'w', encoding='utf8')
@@ -86,7 +82,12 @@ class Changelog:
 
         group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
 
-        return self._normalize_issues(group_name, project_name, commits, only_staging)
+        project = ProjectManagerStrategy().get_instance(os.getcwd())
+        version = project.actual_version()
+
+        changelog_issues = self._normalize_issues(group_name, project_name, commits, only_staging)
+        changelog_issues.version = version
+        return changelog_issues
 
     def _find_last_tag(self, project_name, tags):
         path = os.getcwd()
