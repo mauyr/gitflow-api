@@ -17,7 +17,7 @@ setup(
     description="Gitflow-API library using a API as backend",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
-    url="https://github.com/mauyr/gitflow_api",
+    url="https://github.com/mauyr/gitflow-api",
     packages=find_packages('.'),
     entry_points = {
         'console_scripts': ['gitflow=gitflow_api.gitflow:main'],
