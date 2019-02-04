@@ -13,7 +13,7 @@ class TestDeploy(TestCase):
     @staticmethod
     def fake_config():
         config = Config()
-        config.extension_deploy_class = 'Maven'
+        config.extension_deploy_class = 'gitflow_api.deploy.maven.Maven'
         return config
 
     @staticmethod
@@ -23,10 +23,10 @@ class TestDeploy(TestCase):
 
     @patch.object(DeployStrategy, '_get_config', fake_config)
     def test_get_configured_instance(self):
-        instance = DeployStrategy.get_instance('Pypi')
+        instance = DeployStrategy.get_instance('gitflow_api.deploy.pypi.Pypi')
         self.assertTrue(instance.__qualname__ == 'Maven')
 
     @patch.object(DeployStrategy, '_get_config', fake_config_without_deploy_class)
     def test_get_pypi_instance(self):
-        instance = DeployStrategy.get_instance('Pypi')
+        instance = DeployStrategy.get_instance('gitflow_api.deploy.pypi.Pypi')
         self.assertTrue(instance.__qualname__ == 'Pypi')

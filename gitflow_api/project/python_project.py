@@ -63,7 +63,7 @@ class PythonProject(ProjectManager):
         pass
 
     def deploy(self):
-        DeployStrategy.get_instance(default_deploy_class='Pypi').deploy()
+        DeployStrategy.get_instance(default_deploy_class='gitflow_api.deploy.pypi.Pypi').deploy()
 
     @staticmethod
     def _get_version_filename():

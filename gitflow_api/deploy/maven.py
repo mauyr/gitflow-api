@@ -8,7 +8,8 @@ from gitflow_api.deploy.deploy import Deploy
 class Maven(Deploy):
 
     def __init__(self):
-        super(Maven, self).__init__()
+        super(Maven, self).__init__(Maven.__class__)
+        self.__qualname__ = 'Maven'
 
     def deploy(self):
         mvn_cmd = 'mvn -B deploy -DskipTests'

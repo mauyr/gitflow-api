@@ -9,7 +9,8 @@ from gitflow_api.deploy.deploy import Deploy
 class Pypi(Deploy):
 
     def __init__(self):
-        super(Pypi, self).__init__()
+        super(Pypi, self).__init__(Pypi.__class__)
+        self.__qualname__ = 'Pypi'
 
     def deploy(self):
         # remove dist and build files

@@ -48,7 +48,7 @@ class MavenProject(ProjectManager):
         check_call(mvn_cmd, shell=True)
 
     def deploy(self):
-        DeployStrategy.get_instance(default_deploy_class='Maven').deploy()
+        DeployStrategy.get_instance(default_deploy_class='gitflow_api.deploy.maven.Maven').deploy()
 
     def _get_dependencies_from_path(self):
         tree = ElementTree.parse(self.path + "/" + "pom.xml")
