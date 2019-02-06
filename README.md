@@ -8,6 +8,18 @@ Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab 
 * Python 2.7 to 3.7.
 * Gitlab with v4 api
 
+### Install Requirements
+`1 - Passo`
+`sudo apt install pip3`
+`sudo apt-get install python-pip python-dev build-essential`
+`sudo pip3 install --upgrade pip3`
+`sudo pip3 install --upgrade virtualenv`
+`2 - Passo`
+`sudo pip3 install -U setuptools`
+`3 - Passo`
+`sudo pip3 install GitPython`
+`sudo pip3 install --upgrade pip3 enum34`
+
 ### Install
 If you have downloaded the source code:
 
