@@ -14,8 +14,11 @@ class Pypi(Deploy):
 
     def deploy(self):
         # remove dist and build files
-        shutil.rmtree('dist')
-        shutil.rmtree('build')
+        try:
+            shutil.rmtree('dist')
+            shutil.rmtree('build')
+        except FileNotFoundError:
+            print('Skipping deleting folder')
 
         cmd = 'python setup.py sdist bdist_wheel'
         check_call(cmd, shell=True)

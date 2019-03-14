@@ -16,6 +16,11 @@ apt install pip3
 pip3 install -U setuptools
 ```
 
+For python projects with pip deploy
+```bash
+pip install twine
+```
+
 ## Install
 If you have downloaded the source code:
 
