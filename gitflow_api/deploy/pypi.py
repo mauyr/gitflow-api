@@ -20,7 +20,7 @@ class Pypi(Deploy):
         except FileNotFoundError:
             print('Skipping deleting folder')
 
-        cmd = 'python setup.py sdist bdist_wheel'
+        cmd = 'python3 setup.py sdist bdist_wheel'
         check_call(cmd, shell=True)
 
         cmd = 'twine upload dist/*'
