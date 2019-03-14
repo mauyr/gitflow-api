@@ -1,11 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+from setuptools import setup, find_packages
 
 install_requires = ['GitPython>=2.1.11','python-gitlab>=1.6.0','slackclient>=1.3.0']
 test_requires = []
@@ -13,7 +7,7 @@ test_requires = []
 
 setup(
     name="gitflow-api",
-    version="0.3.3",
+    version="0.3.4",
     description="Gitflow-API library using a API as backend",
     author="Mauyr Alexandre Pereira",
     author_email="mauyr.pereira@inovapro.com.br",
@@ -25,7 +19,7 @@ setup(
     license="GNU GPLv3",
     python_requires='>=3.0',
     install_requires=install_requires,
-    long_description="Gitflow-API is a python library used use a gitflow_api-api methodology on development using a API like "
+    long_description="Gitflow-API is a python library used use a gitflow_methodology on development using a API like "
                      "Gitlab or Github to execute most of process",
     classifiers=[
         # Picked from

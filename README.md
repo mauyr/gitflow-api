@@ -5,32 +5,16 @@ Gitflow é uma biblioteca para que possa utilizar a metodologia Gitflow usando o
 Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab ou Github com acesso de sua API via Token.
 
 * Git (1.7.x or newer)
-* Python 2.7 to 3.7.
+* Python 3.x
 * Gitlab with v4 api
 
 ## Install Requirements
-* 1º Passo
 
-    ```bash
-    sudo apt install pip3
-    sudo apt-get install python-pip python-dev build-essential
-    sudo pip3 install --upgrade pip3
-    sudo pip3 install --upgrade virtualenv
-    ```
-
-* 2º Passo
-
-    ```bash
-    sudo pip3 install -U setuptools
-    ```
-
-* 3º Passo
-
-    ```bash
-    sudo pip3 install GitPython
-    sudo pip3 install --upgrade pip3 enum34
-    ```
-
+```bash
+apt install git
+apt install pip3
+pip3 install -U setuptools
+```
 
 ## Install
 If you have downloaded the source code:
@@ -42,7 +26,7 @@ python setup.py install
 *or* if you want to obtain a copy from the Pypi repository:
 
 ```bash
-pip install gitflow-api
+pip3 install gitflow-api
 ```
 
 Both commands will install the required package dependencies.
