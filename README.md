@@ -12,7 +12,7 @@ Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab 
 
 ```bash
 apt install git
-apt install pip3
+apt install python3-pip
 pip3 install -U setuptools
 ```
 
