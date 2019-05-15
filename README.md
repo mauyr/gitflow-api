@@ -18,8 +18,8 @@ pip3 install -U setuptools
 
 For python projects with pip deploy
 ```bash
-pip install wheel
-pip install twine
+pip3 install wheel
+pip3 install twine
 ```
 
 ## Install
