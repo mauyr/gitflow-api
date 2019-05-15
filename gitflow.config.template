@@ -14,14 +14,14 @@ release_webhook =
 launch_webhook =
 
 [PROPERTIES]
-master_branch = 'master'
-staging_branch = 'staging'
+master_branch = master
+staging_branch = staging
 
-hotfix_branch = 'hotfix/{}'
-feature_branch = 'feature/{}'
-release_branch = 'release/{}'
+hotfix_branch = hotfix/{}
+feature_branch = feature/{}
+release_branch = release/{}
 
-version = '{}-{}'
+version = {}-{}
 
 # Issue Classification - Api Labels
 features_labels = ['story', 'feature']

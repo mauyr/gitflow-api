@@ -41,6 +41,11 @@ A distribution package can be obtained for manual installation at:
 
 http://pypi.python.org/pypi/gitflow-api
 
+If Pip3 script isn't on your path run command above for gitflow command work:
+```bash
+export PATH=~/.local/bin:$PATH
+``` 
+
 If you like to clone from source, you can do it like so:
 
 ```bash
