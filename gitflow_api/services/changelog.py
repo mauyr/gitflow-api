@@ -4,6 +4,7 @@ import json
 import os
 
 from gitflow_api.api.api_strategy import ApiStrategy
+from gitflow_api.communicator.communicator_strategy import CommunicatorStrategy
 from gitflow_api.config.config import Config
 from gitflow_api.utilities.git_helper import GitHelper
 from gitflow_api.project.project_manager_strategy import ProjectManagerStrategy
@@ -28,13 +29,16 @@ class Changelog:
 
         return self._create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
-    def create_markdown_changelog(self, branch, from_tag=None, path=None, only_staging=False, write_changelog=False):
+    def create_markdown_changelog(self, branch, from_tag=None, path=None, only_staging=False, write_changelog=False, send=False):
         changelog_issues = self.create_changelog(branch, from_tag=from_tag, path=path, only_staging=only_staging)
 
         changelog_md = self.make_changelog_md(changelog_issues)
 
         if write_changelog:
             self.write_changelog(changelog_issues)
+
+        if send:
+            self._post_changelog(changelog_issues)
 
         return changelog_md
 
@@ -214,6 +218,12 @@ class Changelog:
 
         return self.config
 
+    def _post_changelog(self, changelog):
+        git = GitHelper()
+        group_name, project_name = GitHelper.extract_group_and_project_from_url(git.get_current_url())
+
+        communicator = CommunicatorStrategy.get_instance()
+        communicator.send_changelog(changelog, communicator.release_webhook, project_name)
 
 class ChangelogIssues:
     version = '0.0.0'

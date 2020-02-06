@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--force', nargs='?', const=True, help='Force to recreate release')
     parser.add_argument('--skipTests', nargs='?', const=True, help='Skip tests')
     parser.add_argument('--writeChangelog', nargs='?', const=True, help='Force write changelog file')
+    parser.add_argument('--send', nargs='?', const=True, help='Send changelog to communicator')
 
     args = parser.parse_args()
 
@@ -42,7 +43,7 @@ def main():
         Release().launch(force=args.force)
     elif args.action.lower() == 'changelog':
         print(Changelog().create_markdown_changelog(args.branch, from_tag=args.fromTag, only_staging=args.onlyStaging,
-                                                    write_changelog=args.writeChangelog))
+                                                    write_changelog=args.writeChangelog, send=args.send))
     elif args.action.lower() == 'adjust-versions':
         VersionUtils.adjust_versions()
     else:
