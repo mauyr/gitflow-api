@@ -58,10 +58,11 @@ class Release:
 
         version = project_management.actual_version().replace('-SNAPSHOT', '')
         group_name, project_name = git.extract_group_and_project()
+        formatted_version = VersionUtils.format_version(self._get_config().version, version, project_name)
 
         if force:
             try:
-                git.delete_tag('{}-{}'.format(project_name, version))
+                git.delete_tag(formatted_version)
             except Exception as e:
                 pass
 
@@ -69,7 +70,7 @@ class Release:
         project_management.update_version(version)
         project_management.update_dependencies_version()
 
-        git.commit_and_push_update_message(self._get_config().master_branch, version)
+        git.commit_and_push_update_message(self._get_config().master_branch, formatted_version)
 
         try:
             changelog_issues = self._create_and_write_changelog()
@@ -77,9 +78,12 @@ class Release:
         except Exception as e:
             print("Fail to create changelog", e)
 
-        git.create_tag(self._get_config().version.format(project_name, version), version)
+        git.create_tag(formatted_version, version)
 
-        project_management.deploy()
+        try:
+            project_management.deploy()
+        except Exception as e:
+            print("Fail to deploy project", e)
 
         # update patch version for next tag
         new_version = self._update_version(Version.PATCH, False)

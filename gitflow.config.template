@@ -21,7 +21,7 @@ hotfix_branch = hotfix/{}
 feature_branch = feature/{}
 release_branch = release/{}
 
-version = {}-{}
+version = {project}-{major}.{minor}.{patch}
 
 # Issue Classification - Api Labels
 features_labels = ['story', 'feature']

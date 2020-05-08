@@ -76,6 +76,16 @@ class VersionUtils:
 
         git.commit_and_push_update_message(config.staging_branch, new_version)
 
+    @staticmethod
+    def format_version(format, version, project_name=''):
+        formatted_version = format
+        formatted_version = formatted_version.replace('{project}', project_name)
+        formatted_version = formatted_version.replace('{major}', str(VersionUtils.extract_version(version, Version.MAJOR)))
+        formatted_version = formatted_version.replace('{minor}', str(VersionUtils.extract_version(version, Version.MINOR)))
+        formatted_version = formatted_version.replace('{patch}', str(VersionUtils.extract_version(version, Version.PATCH)))
+
+        return formatted_version
+
 
 class Version(Enum):
     NONE = 0

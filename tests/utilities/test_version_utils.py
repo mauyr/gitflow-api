@@ -30,3 +30,10 @@ class TestVersionUtils(TestCase):
     def test_get_new_version_patch_decrement_valid(self):
         new_version = VersionUtils.get_new_version('1.0.2', Version.PATCH, False, -1)
         self.assertEqual(new_version, '1.0.1')
+
+    def test_format_version_full_attributes(self):
+        version = '1.0.2'
+        project_name = 'test'
+        format = 'v.{major}.{minor}.{patch}-{project}'
+        formatted_version = VersionUtils.format_version(format, version, project_name)
+        self.assertEqual(formatted_version, 'v.1.0.2-test')
