@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import configparser
+import json
 import os
 
 from gitflow_api.config.properties import *
@@ -101,6 +102,9 @@ class Config:
 
     def _get_property(self, group, config_property, default_property):
         try:
-            return self.config_file[group][config_property]
+            if isinstance(default_property, list):
+                return json.loads(self.config_file[group][config_property])
+            else:
+                return self.config_file[group][config_property]
         except Exception as e:
             return default_property
