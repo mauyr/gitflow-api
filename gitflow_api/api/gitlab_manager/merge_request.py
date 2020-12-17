@@ -59,7 +59,7 @@ class MergeRequest(ApiMergeRequest):
 
     def find_merge_request_by_commit_message(self, group_name, project_name, commit_message):
         merge_request_code = commit_message[commit_message.find('See merge request ') + 18:]
-        merge_request_id = re.search('([1-9])+', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
+        merge_request_id = re.search('([0-9])+', str(merge_request_code[merge_request_code.find('!') + 1:])).group(0)
 
         group = self.project_api.find_group_by_name(group_name)
         project = self.project_api.find_project_by_group_and_name(group, project_name)
