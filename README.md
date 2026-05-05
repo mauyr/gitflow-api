@@ -1,155 +1,163 @@
-# Gitflow
-Gitflow é uma biblioteca para que possa utilizar a metodologia Gitflow usando o o Gitlab ou Github como API.
+# gitflow-api
+
+Modernized **GitLab-first** Git Flow automation library and CLI.
+
+Current MVP status:
+- ✅ GitLab provider
+- ✅ feature start/finish
+- ✅ hotfix start/finish
+- ✅ release start/finish (only when `main != develop`)
+- ✅ `launch` for real platform release creation
+- ✅ changelog generation
+- ✅ machine-friendly JSON output
+- ❌ GitHub provider (not implemented yet)
+
+## Installation
+
+### From source
+
+```bash
+pip install -e .
+```
+
+### Build/package
+
+```bash
+python -m build
+```
 
 ## Requirements
-Gitflow necessita que tenha o executável do `git` e uma instalação do Gitlab ou Github com acesso de sua API via Token.
 
-* Git (1.7.x or newer)
-* Python 3.x
-* Gitlab with v4 api
+- Python 3.10+
+- `git`
+- GitLab project access token with API access
 
-## Install Requirements
+## Configuration
 
-```bash
-apt install git
-apt install python3-pip
-pip3 install -U setuptools
-```
-
-For python projects with pip deploy
-```bash
-pip3 install wheel
-pip3 install twine
-```
-
-## Install
-If you have downloaded the source code:
+Preferred config file name:
 
 ```bash
-python setup.py install
+.gitflow.toml
 ```
 
-*or* if you want to obtain a copy from the Pypi repository:
+You can start from:
 
 ```bash
-pip3 install gitflow-api
+cp .gitflow.toml.example .gitflow.toml
 ```
 
-Both commands will install the required package dependencies.
+Minimal example:
 
-A distribution package can be obtained for manual installation at:
+```toml
+[provider]
+type = "gitlab"
+url = "https://gitlab.example.com"
+token_env = "GITFLOW_GITLAB_TOKEN"
 
-http://pypi.python.org/pypi/gitflow-api
+[branches]
+main = "master"
+develop = "staging"
+feature_prefix = "feature/"
+hotfix_prefix = "hotfix/"
+release_prefix = "release/"
 
-If Pip3 script isn't on your path run command above for gitflow command work:
-```bash
-export PATH=~/.local/bin:$PATH
-``` 
+[merge_request]
+feature_label = "story"
+hotfix_label = "bug"
+draft_prefix = "Draft: "
+remove_source_branch = true
 
-If you like to clone from source, you can do it like so:
+[changelog]
+output_dir = "release_notes"
+version_tag_pattern = "{project}-{version}"
+include_labels = true
+feature_labels = ["story", "feature"]
+bug_labels = ["bug"]
+technical_labels = ["technical debt"]
+ignore_labels = ["ignore"]
 
-```bash
-git clone https://github.com/mauyr/gitflow-api.git
+[behavior]
+require_clean_worktree = true
+auto_push = true
 ```
 
-## Binary distribution
-
-```bash
-pyinstaller --onefile gitflow_api/gitflow.py
-```
-
-
-## RUNNING TESTS
-
-```bash
-python -m tests
-```
-
-
-# Usability
-
-## Hotfix
-Hotfix são sempre criados a partir da branch master³ e devem ser utilizados para correções emergenciais.
-
-### Criando uma novo Hotfix 
-```bash
-gitflow hotfix-start hotfix-branch-1
-```
-
-Podem ser executado de qualquer branch, porém cuidado com arquivos não commitados para não ocasionar conflitos.
-
-Fluxo de execuções:
-* Checkout da branch master³
-* Pull
-* Cria nova branch com o nome do argumento passado mais o prefixo **hotfix/**
-* Checkout para a nova branch
-* Push da nova branch para origin
-* Cria um novo merge request¹ classificado como bug² em estado WIP
-
-### Finalizando um Hotfix
+Export the token referenced by `token_env`:
 
 ```bash
-gitflow hotfix-finish
+export GITFLOW_GITLAB_TOKEN=xxxxx
 ```
 
-Se executado diretamente na branch que deseja finalizar.
+## CLI
 
-```
-gitflow hotfix-finish hotfix-branch-1
-```
+The package installs the `gitflow` command.
 
-Para executar a partir de outra branch.
- 
-Fluxo de execuções:
-* Opcional: Checkout da branch passada
-* Checa se merge request¹ não tem conflitos ou está em algum estado que impeça sua reintegração
-* Em caso de conflito, tenta fazer merge automático
-* Realiza o merge com a branch master³
-* Push de todas as alterações
-
-## Features
-Features são sempre criados a partir da branch staging³ e devem ser utilizados para novas funcionalidades, débitos técnicos ou bugs não emergenciais.
-
-### Criando uma nova Feature
-```bash
-gitflow feature-start feature-branch-1
-```
-
-Podem ser executado de qualquer branch, porém cuidado com arquivos não commitados para não ocasionar conflitos.
-
-Fluxo de execuções:
-* Checkout da branch staging³
-* Pull
-* Cria nova branch com o nome do argumento passado mais prefixo **feature/**
-* Checkout para a nova branch
-* Push da nova branch para origin
-* Cria um novo merge request¹ classificado como feature² em estado WIP
-
-### Finalizando uma Feature
-```bash
-gitflow feature-finish
-```
-
-Se executado diretamente na branch que deseja finalizar.
+### Health/config
 
 ```bash
-gitflow feature-finish feature-branch-1
+gitflow version
+gitflow config-check --json
 ```
 
-Para executar a partir de outra branch.
- 
-Fluxo de execuções:
-* Opcional: Checkout da branch passada
-* Checa se merge request¹ não tem conflitos ou está em algum estado que impeça sua reintegração
-* Em caso de conflito, tenta fazer merge automático
-* Realiza o merge com a branch staging³
-* Push de todas as alterações
-
-## Release
+### Feature flow
 
 ```bash
-gitflow release-start
-gitflow release-finish
-gitflow launch
-gitflow changelog
+gitflow feature start my-feature --title "My Feature"
+gitflow feature finish
 ```
+
+### Hotfix flow
+
+```bash
+gitflow hotfix start urgent-fix --title "Urgent Fix"
+gitflow hotfix finish
+```
+
+### Release flow
+
+`release start` / `release finish` only make sense when the project uses two distinct long-lived branches, e.g. `master` and `staging`.
+
+If `main == develop`, the command fails intentionally.
+
+```bash
+gitflow release start 1.2.3
+gitflow release finish
+```
+
+Semantics:
+- `release start` = freeze what is in `develop/staging`
+- `release finish` = reintegrate the release branch into `main/master`
+- `launch` = create tag + platform release in GitLab
+
+### Launch
+
+```bash
+gitflow launch 1.2.3
+```
+
+### Changelog
+
+```bash
+gitflow changelog 1.2.3
+```
+
+## JSON output
+
+Use `--json` for automation or future agent skill wrappers:
+
+```bash
+gitflow --json feature start my-feature
+gitflow --json release start 1.2.3
+gitflow --json launch 1.2.3
+```
+
+## Tests
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests/unit -t . -v
+```
+
+## Notes
+
+- This MVP is intentionally **GitLab-only**.
+- The old GitHub claim was removed because it was fiction dressed as documentation.
+- The future agent skill should wrap this CLI/library instead of reimplementing the workflow.

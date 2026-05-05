@@ -1,6 +1,3 @@
-# Legacy filename kept temporarily for discoverability.
-# Preferred filename for the modernized tool: .gitflow.toml
-
 [provider]
 type = "gitlab"
 url = "https://gitlab.example.com"

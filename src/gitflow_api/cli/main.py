@@ -29,7 +29,7 @@ from gitflow_api.domain.exceptions import GitflowError
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="gitflow-next", description="Modernized gitflow-api CLI bootstrap")
+    parser = argparse.ArgumentParser(prog="gitflow", description="Modernized gitflow-api CLI")
     parser.add_argument("--config", dest="config_path", help="Path to .gitflow.toml")
     parser.add_argument("--repo", dest="repo_path", help="Path to the target git repository")
     parser.add_argument("--json", action="store_true", dest="as_json", help="Render machine-friendly JSON output")
