@@ -7,12 +7,13 @@ from .exceptions import (
     MergeRequestNotFoundError,
     MergeRequestNotReadyError,
     ProviderError,
+    ReleaseFlowError,
     RepositoryError,
     UnsupportedProviderError,
     WorkingTreeNotCleanError,
 )
 from .models import BranchNames, ChangelogItem, MergeRequestInfo, ReleaseNotes
-from .results import BaseResult, ChangelogResult, FeatureFinishResult, FeatureStartResult, ReleaseStartResult
+from .results import BaseResult, ChangelogResult, FeatureFinishResult, FeatureStartResult, LaunchResult, ReleaseFinishResult, ReleaseStartResult
 
 __all__ = [
     "BaseResult",
@@ -30,8 +31,11 @@ __all__ = [
     "MergeRequestNotFoundError",
     "MergeRequestNotReadyError",
     "ProviderError",
+    "ReleaseFinishResult",
+    "ReleaseFlowError",
     "ReleaseNotes",
     "ReleaseStartResult",
+    "LaunchResult",
     "RepositoryError",
     "UnsupportedProviderError",
     "WorkingTreeNotCleanError",

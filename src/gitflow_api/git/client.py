@@ -56,11 +56,19 @@ class GitClient:
             command.extend(["-m", message])
         self._run(command)
 
+    def push_tag(self, tag: str) -> None:
+        self._run(["git", "push", "origin", tag])
+
     def delete_tag(self, tag: str) -> None:
         self._run(["git", "tag", "-d", tag])
 
-    def log(self, revspec: str) -> str:
-        return self._run(["git", "log", revspec]).stdout
+    def latest_tag(self) -> str | None:
+        result = self._run(["git", "describe", "--tags", "--abbrev=0"], check=False)
+        return result.stdout.strip() or None
+
+    def log(self, revspec: str | None = None) -> str:
+        command = ["git", "log"] if revspec is None else ["git", "log", revspec]
+        return self._run(command).stdout
 
     def _run(self, command: list[str], check: bool = True) -> GitCommandResult:
         process = subprocess.run(

@@ -3,6 +3,7 @@ from __future__ import annotations
 from gitflow_api.config.models import ProviderConfig
 from gitflow_api.providers.gitlab.client import GitLabClientFactory
 from gitflow_api.providers.gitlab.merge_request_service import GitLabMergeRequestService
+from gitflow_api.providers.gitlab.release_service import GitLabReleaseService
 
 
 class GitLabProvider:
@@ -10,6 +11,7 @@ class GitLabProvider:
         factory = client_factory or GitLabClientFactory()
         self.client = factory(config.url, config.token)
         self.merge_requests = GitLabMergeRequestService(self.client)
+        self.releases = GitLabReleaseService(self.client)
 
     def find_merge_request(
         self,
@@ -65,3 +67,16 @@ class GitLabProvider:
         state: str = "merged",
     ):
         return self.merge_requests.list(remote_url, target_branch, state)
+
+    def find_merge_request_by_commit_message(self, remote_url: str, commit_message: str):
+        return self.merge_requests.find_by_commit_message(remote_url, commit_message)
+
+    def create_release(
+        self,
+        remote_url: str,
+        tag_name: str,
+        name: str,
+        description: str,
+        ref: str | None = None,
+    ):
+        return self.releases.create(remote_url, tag_name, name, description, ref)

@@ -51,3 +51,16 @@ class MergeRequestProvider(Protocol):
         state: str = "merged",
     ) -> list[MergeRequestInfo]:
         ...
+
+    def find_merge_request_by_commit_message(self, remote_url: str, commit_message: str) -> MergeRequestInfo | None:
+        ...
+
+    def create_release(
+        self,
+        remote_url: str,
+        tag_name: str,
+        name: str,
+        description: str,
+        ref: str | None = None,
+    ) -> dict:
+        ...

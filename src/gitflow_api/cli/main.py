@@ -7,14 +7,22 @@ from dataclasses import asdict, is_dataclass
 from gitflow_api import __version__
 from gitflow_api.application.factories import build_context
 from gitflow_api.application.use_cases import (
+    ChangelogInput,
     FeatureFinishInput,
     FeatureStartInput,
     HotfixFinishInput,
     HotfixStartInput,
+    LaunchInput,
+    ReleaseFinishInput,
+    ReleaseStartInput,
+    execute_changelog,
     execute_feature_finish,
     execute_feature_start,
     execute_hotfix_finish,
     execute_hotfix_start,
+    execute_launch,
+    execute_release_finish,
+    execute_release_start,
 )
 from gitflow_api.config import load_config
 from gitflow_api.domain.exceptions import GitflowError
@@ -55,6 +63,26 @@ def build_parser() -> argparse.ArgumentParser:
     hotfix_start.add_argument("--draft", action=argparse.BooleanOptionalAction, default=True)
     hotfix_finish = hotfix_sub.add_parser("finish", help="Merge hotfix MR")
     hotfix_finish.add_argument("branch", nargs="?")
+
+    release_parser = subparsers.add_parser("release", help="Release branch workflows")
+    release_sub = release_parser.add_subparsers(dest="release_command")
+    release_sub.required = True
+    release_start = release_sub.add_parser("start", help="Create release branch and MR")
+    release_start.add_argument("version")
+    release_start.add_argument("--title")
+    release_start.add_argument("--description")
+    release_start.add_argument("--draft", action=argparse.BooleanOptionalAction, default=False)
+    release_finish = release_sub.add_parser("finish", help="Merge release MR")
+    release_finish.add_argument("branch", nargs="?")
+    release_finish.add_argument("--no-sync-mr", action="store_true", dest="no_sync_mr")
+
+    launch_parser = subparsers.add_parser("launch", help="Create tag and platform release")
+    launch_parser.add_argument("version")
+    launch_parser.add_argument("--ref")
+
+    changelog_parser = subparsers.add_parser("changelog", help="Generate changelog")
+    changelog_parser.add_argument("version")
+    changelog_parser.add_argument("--from-ref")
 
     return parser
 
@@ -105,6 +133,33 @@ def main(argv: list[str] | None = None) -> int:
             if args.hotfix_command == "finish":
                 result = execute_hotfix_finish(HotfixFinishInput(branch=args.branch), ctx)
                 return _emit(_to_payload(result), args.as_json)
+        if args.command == "release":
+            ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
+            if args.release_command == "start":
+                result = execute_release_start(
+                    ReleaseStartInput(
+                        version=args.version,
+                        title=args.title,
+                        draft=args.draft,
+                        description=args.description,
+                    ),
+                    ctx,
+                )
+                return _emit(_to_payload(result), args.as_json)
+            if args.release_command == "finish":
+                result = execute_release_finish(
+                    ReleaseFinishInput(branch=args.branch, create_sync_merge_request=not args.no_sync_mr),
+                    ctx,
+                )
+                return _emit(_to_payload(result), args.as_json)
+        if args.command == "launch":
+            ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
+            result = execute_launch(LaunchInput(version=args.version, ref=args.ref), ctx)
+            return _emit(_to_payload(result), args.as_json)
+        if args.command == "changelog":
+            ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
+            result = execute_changelog(ChangelogInput(version=args.version, from_ref=args.from_ref), ctx)
+            return _emit(_to_payload(result), args.as_json)
         parser.error(f"Unknown command: {args.command}")
     except GitflowError as exc:
         return _emit_error(exc, args.as_json)
@@ -122,9 +177,19 @@ def _emit(payload: dict, as_json: bool) -> int:
             print(payload.get("message", "OK"))
             if payload.get("branch"):
                 print(f"branch: {payload['branch']}")
+            if payload.get("tag"):
+                print(f"tag: {payload['tag']}")
             merge_request = payload.get("merge_request")
             if isinstance(merge_request, dict) and merge_request.get("url"):
                 print(f"merge_request: {merge_request['url']}")
+            sync_merge_request = payload.get("sync_merge_request")
+            if isinstance(sync_merge_request, dict) and sync_merge_request.get("url"):
+                print(f"sync_merge_request: {sync_merge_request['url']}")
+            release = payload.get("release")
+            if isinstance(release, dict) and release.get("url"):
+                print(f"release: {release['url']}")
+            if payload.get("markdown"):
+                print(payload["markdown"])
         else:
             print("Config OK")
     return 0

@@ -34,6 +34,22 @@ class ReleaseStartResult(BaseResult):
 
 
 @dataclass(frozen=True)
+class ReleaseFinishResult(BaseResult):
+    branch: str
+    merged_to: str
+    merge_request: dict[str, Any] | None = None
+    sync_merge_request: dict[str, Any] | None = None
+
+
+@dataclass(frozen=True)
+class LaunchResult(BaseResult):
+    version: str
+    tag: str
+    release: dict[str, Any] | None = None
+    markdown: str = ""
+
+
+@dataclass(frozen=True)
 class ChangelogResult(BaseResult):
     version: str
     markdown: str

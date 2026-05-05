@@ -38,9 +38,24 @@ class FakeMergeRequestManager:
         return mr
 
 
+class FakeReleaseManager:
+    def __init__(self):
+        self.created_payload = None
+
+    def create(self, payload):
+        self.created_payload = payload
+        return SimpleNamespace(
+            name=payload["name"],
+            tag_name=payload["tag_name"],
+            description=payload["description"],
+            url=f"https://gitlab.example.com/group/project/-/releases/{payload['tag_name']}",
+        )
+
+
 class FakeProject:
     def __init__(self, merge_requests=None):
         self.mergerequests = FakeMergeRequestManager(merge_requests)
+        self.releases = FakeReleaseManager()
 
 
 class FakeProjectsApi:
@@ -188,3 +203,16 @@ token = "secret"
                 "feature/missing",
                 "staging",
             )
+
+    def test_create_release_maps_payload(self):
+        project = FakeProject()
+        provider = GitLabProvider(self._load_provider_config(), client_factory=lambda *_: FakeGitLabClient(project))
+        result = provider.create_release(
+            "https://gitlab.example.com/group/project.git",
+            tag_name="project-1.2.3",
+            name="project 1.2.3",
+            description="notes",
+            ref="master",
+        )
+        self.assertEqual(project.releases.created_payload["ref"], "master")
+        self.assertEqual(result["tag_name"], "project-1.2.3")

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from gitflow_api.domain.exceptions import MergeRequestNotFoundError, MergeRequestNotReadyError
 from gitflow_api.providers.gitlab.mapper import GitLabMapper
 from gitflow_api.providers.gitlab.project_resolver import GitLabProjectResolver
@@ -98,6 +100,14 @@ class GitLabMergeRequestService:
                 continue
             items.append(GitLabMapper.merge_request(merge_request))
         return items
+
+    def find_by_commit_message(self, remote_url: str, commit_message: str):
+        match = re.search(r"!([0-9]+)", commit_message)
+        if match is None:
+            return None
+        project = self.project_resolver.resolve(remote_url)
+        merge_request = project.mergerequests.get(int(match.group(1)))
+        return GitLabMapper.merge_request(merge_request)
 
     def _find_raw(self, project, source_branch: str, target_branch: str | None = None):
         merge_requests = project.mergerequests.list(state="opened", all=True)

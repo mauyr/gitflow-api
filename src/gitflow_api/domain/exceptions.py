@@ -40,3 +40,7 @@ class MergeRequestNotReadyError(ProviderError):
 
 class ChangelogError(GitflowError):
     """Raised when changelog generation fails."""
+
+
+class ReleaseFlowError(GitflowError):
+    """Raised when the configured repository cannot execute the requested release flow."""
