@@ -23,8 +23,6 @@ def execute(data: ChangelogInput, ctx: AppContext) -> ChangelogResult:
     items: list[ChangelogItem] = []
     seen: set[int] = set()
     for line in log.splitlines():
-        if "See merge request" not in line:
-            continue
         merge_request = ctx.provider.find_merge_request_by_commit_message(remote_url, line)
         if merge_request is None or merge_request.id in seen:
             continue

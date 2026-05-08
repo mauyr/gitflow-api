@@ -1,16 +1,16 @@
 # gitflow-api
 
-Modernized **GitLab-first** Git Flow automation library and CLI.
+Modernized Git Flow automation library and CLI for GitLab and GitHub.
 
 Current MVP status:
 - ✅ GitLab provider
+- ✅ GitHub provider
 - ✅ feature start/finish
 - ✅ hotfix start/finish
 - ✅ release start/finish (only when `main != develop`)
 - ✅ `launch` for real platform release creation
 - ✅ changelog generation
 - ✅ machine-friendly JSON output
-- ❌ GitHub provider (not implemented yet)
 
 ## Installation
 
@@ -30,7 +30,7 @@ python -m build
 
 - Python 3.10+
 - `git`
-- GitLab project access token with API access
+- GitLab project access token with API access, or GitHub token with repo access
 
 ## Configuration
 
@@ -46,7 +46,7 @@ You can start from:
 cp .gitflow.toml.example .gitflow.toml
 ```
 
-Minimal example:
+Minimal GitLab example:
 
 ```toml
 [provider]
@@ -81,10 +81,23 @@ require_clean_worktree = true
 auto_push = true
 ```
 
+GitHub example:
+
+```toml
+[provider]
+type = "github"
+url = "https://api.github.com"
+token_env = "GITHUB_TOKEN"
+```
+
+For GitHub Enterprise, prefer the API base URL, e.g. `https://github.company.com/api/v3`.
+
 Export the token referenced by `token_env`:
 
 ```bash
 export GITFLOW_GITLAB_TOKEN=xxxxx
+# or
+export GITHUB_TOKEN=xxxxx
 ```
 
 ## CLI
@@ -126,7 +139,7 @@ gitflow release finish
 Semantics:
 - `release start` = freeze what is in `develop/staging`
 - `release finish` = reintegrate the release branch into `main/master`
-- `launch` = create tag + platform release in GitLab
+- `launch` = create tag + platform release in the configured provider
 
 ### Launch
 
@@ -158,6 +171,5 @@ PYTHONPATH=src python -m unittest discover -s tests/unit -t . -v
 
 ## Notes
 
-- This MVP is intentionally **GitLab-only**.
-- The old GitHub claim was removed because it was fiction dressed as documentation.
+- Internal naming still uses `merge_request` in a few interfaces; on GitHub that maps to pull requests.
 - The future agent skill should wrap this CLI/library instead of reimplementing the workflow.

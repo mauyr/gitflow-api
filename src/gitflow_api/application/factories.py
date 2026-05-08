@@ -6,6 +6,7 @@ from gitflow_api.application.context import AppContext
 from gitflow_api.config import load_config
 from gitflow_api.domain.exceptions import UnsupportedProviderError
 from gitflow_api.git.client import GitClient
+from gitflow_api.providers.github import GitHubProvider
 from gitflow_api.providers.gitlab import GitLabProvider
 
 
@@ -25,14 +26,16 @@ def build_context(
     if provider is not None:
         resolved_provider = provider
     else:
-        if config.provider.type != "gitlab":
+        if provider_factory is not None:
+            resolved_provider = provider_factory(config.provider)
+        elif config.provider.type == "gitlab":
+            resolved_provider = GitLabProvider(config.provider)
+        elif config.provider.type == "github":
+            resolved_provider = GitHubProvider(config.provider)
+        else:
             raise UnsupportedProviderError(
                 f"Provider '{config.provider.type}' is not supported by this build."
             )
-        if provider_factory is not None:
-            resolved_provider = provider_factory(config.provider)
-        else:
-            resolved_provider = GitLabProvider(config.provider)
 
     return AppContext(
         config=config,

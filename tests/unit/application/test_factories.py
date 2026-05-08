@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from gitflow_api.application.factories import build_context
+from gitflow_api.providers.github.provider import GitHubProvider
 
 
 class DummyProvider:
@@ -35,3 +36,24 @@ token_env = "CTX_GITLAB_TOKEN"
         self.assertIs(context.provider, provider)
         self.assertEqual(context.config.provider.url, "https://gitlab.example.com")
         self.assertEqual(context.repo_path, str(repo_path.resolve()))
+
+    def test_build_context_builds_github_provider(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_path = Path(tmp)
+            (repo_path / ".gitflow.toml").write_text(
+                """
+[provider]
+type = "github"
+url = "https://api.github.com"
+token = "secret"
+""".strip(),
+                encoding="utf-8",
+            )
+            old_cwd = Path.cwd()
+            try:
+                os.chdir(repo_path)
+                context = build_context()
+            finally:
+                os.chdir(old_cwd)
+
+        self.assertIsInstance(context.provider, GitHubProvider)

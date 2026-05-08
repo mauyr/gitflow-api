@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gitflow-api"
 version = "0.4.0"
-description = "GitFlow automation library and CLI with GitLab support"
+description = "GitFlow automation library and CLI with GitLab and Github support"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "GPL-3.0-only"
 authors = [
   { name = "Mauyr Alexandre Pereira", email = "mauyr.pereira@inovapro.com.br" }
 ]
-keywords = ["gitflow", "gitlab", "release", "merge-request", "cli"]
+keywords = ["gitflow", "github", "gitlab", "release", "merge-request", "cli"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",

@@ -34,14 +34,34 @@ develop = "develop"
         self.assertEqual(config.branches.main, "master")
         self.assertEqual(config.branches.develop, "develop")
 
-    def test_rejects_unsupported_provider(self):
+    def test_loads_github_provider_with_default_token_env(self):
         with tempfile.TemporaryDirectory() as tmp:
             config_path = Path(tmp) / ".gitflow.toml"
             config_path.write_text(
                 """
 [provider]
 type = "github"
-url = "https://github.com"
+url = "https://api.github.com"
+""".strip(),
+                encoding="utf-8",
+            )
+            os.environ["GITHUB_TOKEN"] = "github-secret"
+            try:
+                config = load_config(config_path)
+            finally:
+                os.environ.pop("GITHUB_TOKEN", None)
+
+        self.assertEqual(config.provider.type, "github")
+        self.assertEqual(config.provider.token, "github-secret")
+
+    def test_rejects_unsupported_provider(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path = Path(tmp) / ".gitflow.toml"
+            config_path.write_text(
+                """
+[provider]
+type = "bitbucket"
+url = "https://bitbucket.org"
 token = "x"
 """.strip(),
                 encoding="utf-8",

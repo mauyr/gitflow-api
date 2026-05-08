@@ -9,8 +9,8 @@ def require_non_empty(value: str, field_name: str) -> str:
 
 def ensure_provider_supported(provider_type: str) -> str:
     normalized = provider_type.strip().lower()
-    if normalized != "gitlab":
+    if normalized not in {"gitlab", "github"}:
         raise ConfigError(
-            f"Unsupported provider '{provider_type}'. The MVP currently supports only 'gitlab'."
+            f"Unsupported provider '{provider_type}'. Supported providers: 'gitlab', 'github'."
         )
     return normalized

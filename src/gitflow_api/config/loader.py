@@ -32,11 +32,17 @@ def load_config(config_path: str | os.PathLike[str] | None = None) -> AppConfig:
         _deep_merge(raw_config, file_config)
 
     provider_section = raw_config["provider"]
-    token_env = provider_section.get("token_env", "GITFLOW_GITLAB_TOKEN")
+    provider_type = ensure_provider_supported(str(provider_section.get("type", "gitlab")))
+    token_env = str(provider_section.get("token_env") or "").strip()
+    if not token_env or (
+        token_env == str(DEFAULT_CONFIG["provider"].get("token_env", "")).strip()
+        and provider_type != str(DEFAULT_CONFIG["provider"].get("type", "gitlab")).strip().lower()
+    ):
+        token_env = _default_token_env(provider_type)
     token = str(provider_section.get("token") or os.environ.get(token_env, "")).strip()
 
     provider = ProviderConfig(
-        type=ensure_provider_supported(str(provider_section.get("type", "gitlab"))),
+        type=provider_type,
         url=require_non_empty(str(provider_section.get("url", "")), "provider.url"),
         token=require_non_empty(token, f"provider.token or env:{token_env}"),
     )
@@ -134,6 +140,12 @@ def _parse_toml_value(raw_value: str) -> Any:
         return ast.literal_eval(raw_value)
     except (SyntaxError, ValueError):
         return raw_value.strip('"')
+
+
+def _default_token_env(provider_type: str) -> str:
+    if provider_type == "github":
+        return "GITHUB_TOKEN"
+    return "GITFLOW_GITLAB_TOKEN"
 
 
 def _deep_merge(base: dict[str, Any], incoming: dict[str, Any]) -> None:
