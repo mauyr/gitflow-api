@@ -171,9 +171,7 @@ def _emit(payload: dict, as_json: bool) -> int:
     if as_json:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
     else:
-        if "version" in payload:
-            print(payload["version"])
-        elif payload.get("action"):
+        if payload.get("action"):
             print(payload.get("message", "OK"))
             if payload.get("branch"):
                 print(f"branch: {payload['branch']}")
@@ -190,6 +188,8 @@ def _emit(payload: dict, as_json: bool) -> int:
                 print(f"release: {release['url']}")
             if payload.get("markdown"):
                 print(payload["markdown"])
+        elif "version" in payload:
+            print(payload["version"])
         else:
             print("Config OK")
     return 0

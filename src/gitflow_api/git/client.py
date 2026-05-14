@@ -3,7 +3,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from gitflow_api.domain.exceptions import BranchNotFoundError, RepositoryError
+from gitflow_api.domain.exceptions import BranchNotFoundError, ChangelogError, RepositoryError
 from gitflow_api.git.models import GitCommandResult
 
 
@@ -63,8 +63,19 @@ class GitClient:
         self._run(["git", "tag", "-d", tag])
 
     def latest_tag(self) -> str | None:
-        result = self._run(["git", "describe", "--tags", "--abbrev=0"], check=False)
-        return result.stdout.strip() or None
+        result = self._run(
+            ["git", "for-each-ref", "--sort=-creatordate", "--format=%(refname:strip=2)", "refs/tags"],
+            check=False,
+        )
+        tags = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        return tags[0] if tags else None
+
+    def resolve_commit(self, ref: str) -> str:
+        result = self._run(["git", "rev-parse", "--verify", f"{ref}^{{commit}}"], check=False)
+        commit = result.stdout.strip()
+        if result.returncode != 0 or not commit:
+            raise ChangelogError(f"Invalid from-ref: {ref}")
+        return commit
 
     def log(self, revspec: str | None = None) -> str:
         command = ["git", "log"] if revspec is None else ["git", "log", revspec]

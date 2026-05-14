@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from gitflow_api.application.context import AppContext
+from gitflow_api.domain.exceptions import ChangelogError
 from gitflow_api.domain.models import ChangelogItem
 from gitflow_api.domain.results import ChangelogResult
 from gitflow_api.git import parse_remote_url
@@ -17,8 +18,9 @@ class ChangelogInput:
 def execute(data: ChangelogInput, ctx: AppContext) -> ChangelogResult:
     remote_url = ctx.git.current_remote_url()
     project_name = parse_remote_url(remote_url).project
-    start_ref = data.from_ref or ctx.git.latest_tag()
-    log = ctx.git.log(None if start_ref is None else f"{start_ref}..HEAD")
+
+    start_commit = _resolve_start_commit(data.from_ref, project_name, ctx)
+    log = ctx.git.log(None if start_commit is None else f"{start_commit}..HEAD")
 
     items: list[ChangelogItem] = []
     seen: set[int] = set()
@@ -48,6 +50,26 @@ def execute(data: ChangelogInput, ctx: AppContext) -> ChangelogResult:
         markdown=markdown,
         items=[item.__dict__ for item in items],
     )
+
+
+def _resolve_start_commit(from_ref: str | None, project_name: str, ctx: AppContext) -> str | None:
+    if from_ref is None:
+        latest_tag = ctx.git.latest_tag()
+        return ctx.git.resolve_commit(latest_tag) if latest_tag else None
+
+    candidates = [from_ref]
+    rendered_tag = ctx.config.changelog.version_tag_pattern.format(project=project_name, version=from_ref)
+    if rendered_tag not in candidates:
+        candidates.append(rendered_tag)
+
+    for candidate in candidates:
+        try:
+            return ctx.git.resolve_commit(candidate)
+        except ChangelogError:
+            continue
+
+    tried = ", ".join(candidates)
+    raise ChangelogError(f"Invalid from-ref: {from_ref} (tried: {tried})")
 
 
 def _classify_type(labels: list[str], ctx: AppContext) -> str:

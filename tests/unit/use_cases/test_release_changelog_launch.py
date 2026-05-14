@@ -6,15 +6,16 @@ from gitflow_api.application.use_cases.launch import LaunchInput, execute as exe
 from gitflow_api.application.use_cases.release_finish import ReleaseFinishInput, execute as execute_release_finish
 from gitflow_api.application.use_cases.release_start import ReleaseStartInput, execute as execute_release_start
 from gitflow_api.config.models import AppConfig, BehaviorConfig, BranchConfig, ChangelogConfig, MergeRequestConfig, ProviderConfig
-from gitflow_api.domain.exceptions import ReleaseFlowError
+from gitflow_api.domain.exceptions import ChangelogError, ReleaseFlowError
 from gitflow_api.domain.models import MergeRequestInfo
 
 
 class FakeGit:
-    def __init__(self, *, current_branch="release/1.2.3", remote_url="https://gitlab.example.com/group/project.git", latest_tag="project-1.2.2", log_output=""):
+    def __init__(self, *, current_branch="release/1.2.3", remote_url="https://gitlab.example.com/group/project.git", latest_tag="project-1.2.2", resolved_refs=None, log_output=""):
         self._current_branch = current_branch
         self._remote_url = remote_url
         self._latest_tag = latest_tag
+        self._resolved_refs = resolved_refs or {latest_tag: "abc123"}
         self._log_output = log_output
         self.actions = []
 
@@ -47,7 +48,14 @@ class FakeGit:
         self.actions.append(("pull", branch))
 
     def latest_tag(self):
+        self.actions.append(("latest_tag",))
         return self._latest_tag
+
+    def resolve_commit(self, ref):
+        self.actions.append(("resolve_commit", ref))
+        if ref not in self._resolved_refs:
+            raise ChangelogError(f"Invalid from-ref: {ref}")
+        return self._resolved_refs[ref]
 
     def log(self, revspec=None):
         self.actions.append(("log", revspec))
@@ -185,13 +193,57 @@ class ReleaseLaunchTests(unittest.TestCase):
         self.assertIsNotNone(result.sync_merge_request)
         self.assertIn(("checkout", "master"), git.actions)
 
-    def test_changelog_uses_git_log_and_provider_lookup(self):
+    def test_changelog_uses_latest_created_tag_commit_when_from_ref_is_missing(self):
         git = FakeGit(log_output="commit a\n    See merge request group/project!10\n")
         provider = FakeProvider()
         result = execute_changelog(ChangelogInput(version="1.2.3"), self._context(git=git, provider=provider))
         self.assertEqual(len(result.items), 1)
         self.assertIn("Story A", result.markdown)
-        self.assertIn(("log", "project-1.2.2..HEAD"), git.actions)
+        self.assertIn(("latest_tag",), git.actions)
+        self.assertIn(("resolve_commit", "project-1.2.2"), git.actions)
+        self.assertIn(("log", "abc123..HEAD"), git.actions)
+
+    def test_changelog_resolves_from_ref_tag_to_commit_before_loading_log(self):
+        git = FakeGit(
+            latest_tag="project-1.2.2",
+            resolved_refs={"v.1.3.0": "def456"},
+            log_output="commit a\n    See merge request group/project!10\n",
+        )
+        provider = FakeProvider()
+        result = execute_changelog(ChangelogInput(version="1.4.0", from_ref="v.1.3.0"), self._context(git=git, provider=provider))
+        self.assertEqual(len(result.items), 1)
+        self.assertIn(("resolve_commit", "v.1.3.0"), git.actions)
+        self.assertIn(("log", "def456..HEAD"), git.actions)
+
+    def test_changelog_accepts_commit_hash_as_from_ref(self):
+        commit = "41f96923aa7cc7fa320e6ca3effe28074bd25067"
+        git = FakeGit(
+            resolved_refs={commit: commit},
+            log_output="commit a\n    See merge request group/project!10\n",
+        )
+        provider = FakeProvider()
+        result = execute_changelog(ChangelogInput(version="1.4.0", from_ref=commit), self._context(git=git, provider=provider))
+        self.assertEqual(len(result.items), 1)
+        self.assertIn(("resolve_commit", commit), git.actions)
+        self.assertIn(("log", f"{commit}..HEAD"), git.actions)
+
+    def test_changelog_resolves_from_ref_using_configured_tag_pattern(self):
+        git = FakeGit(
+            resolved_refs={"project-1.3.0": "ghi789"},
+            log_output="commit a\n    See merge request group/project!10\n",
+        )
+        provider = FakeProvider()
+        result = execute_changelog(ChangelogInput(version="1.4.0", from_ref="1.3.0"), self._context(git=git, provider=provider))
+        self.assertEqual(len(result.items), 1)
+        self.assertIn(("resolve_commit", "1.3.0"), git.actions)
+        self.assertIn(("resolve_commit", "project-1.3.0"), git.actions)
+        self.assertIn(("log", "ghi789..HEAD"), git.actions)
+
+    def test_changelog_reports_candidates_when_from_ref_cannot_be_resolved(self):
+        git = FakeGit(log_output="commit a\n    See merge request group/project!10\n")
+        provider = FakeProvider()
+        with self.assertRaisesRegex(ChangelogError, r"Invalid from-ref: 1.3.0 \(tried: 1.3.0, project-1.3.0\)"):
+            execute_changelog(ChangelogInput(version="1.4.0", from_ref="1.3.0"), self._context(git=git, provider=provider))
 
     def test_launch_creates_tag_and_release(self):
         git = FakeGit(log_output="commit a\n    See merge request group/project!10\n")
