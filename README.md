@@ -173,3 +173,4 @@ PYTHONPATH=src python -m unittest discover -s tests/unit -t . -v
 
 - Internal naming still uses `merge_request` in a few interfaces; on GitHub that maps to pull requests.
 - The future agent skill should wrap this CLI/library instead of reimplementing the workflow.
+
