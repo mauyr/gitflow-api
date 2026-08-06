@@ -34,17 +34,43 @@ python -m build
 
 ## Configuration
 
-Preferred config file name:
+The CLI resolves configuration in this order:
+
+1. Explicit file passed with `--config`
+2. Project config in the target repository: `gitflow.toml` or `.gitflow.toml`
+3. Global config: `GITFLOW_CONFIG`, then `$XDG_CONFIG_HOME/gitflow/gitflow.toml`, then `~/.gitflow.toml`
+4. Built-in defaults
+
+Preferred project config file name:
 
 ```bash
-.gitflow.toml
+gitflow.toml
 ```
 
 You can start from:
 
 ```bash
-cp .gitflow.toml.example .gitflow.toml
+cp .gitflow.toml.example gitflow.toml
 ```
+
+Or let the CLI create the file:
+
+```bash
+gitflow install
+```
+
+The installer asks whether the config should be created for the project or globally,
+which provider to use, and the token to store in the generated config.
+
+Non-interactive examples:
+
+```bash
+gitflow install --scope global --provider github --token "$GITHUB_TOKEN" --non-interactive
+gitflow --repo /path/to/project install --scope project --provider gitlab --token "$GITFLOW_GITLAB_TOKEN" --non-interactive
+```
+
+Use `--force` to overwrite an existing config file.
+For local setup, prefer the interactive command so the token is read without showing up in shell history.
 
 Minimal GitLab example:
 
@@ -173,4 +199,3 @@ PYTHONPATH=src python -m unittest discover -s tests/unit -t . -v
 
 - Internal naming still uses `merge_request` in a few interfaces; on GitHub that maps to pull requests.
 - The future agent skill should wrap this CLI/library instead of reimplementing the workflow.
-

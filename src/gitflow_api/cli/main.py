@@ -25,6 +25,7 @@ from gitflow_api.application.use_cases import (
     execute_release_start,
 )
 from gitflow_api.config import load_config
+from gitflow_api.config.installer import install_config
 from gitflow_api.domain.exceptions import GitflowError
 
 
@@ -39,6 +40,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers.add_parser("version", help="Show package version")
     subparsers.add_parser("config-check", help="Validate configuration loading")
+    install_parser = subparsers.add_parser("install", help="Create a project or global gitflow.toml")
+    install_parser.add_argument("--scope", choices=("project", "global"), help="Where to create the config")
+    install_parser.add_argument("--provider", choices=("github", "gitlab"), help="Provider type")
+    install_parser.add_argument("--url", help="Provider base URL")
+    install_parser.add_argument("--token", help="Provider token to store in the config file")
+    install_parser.add_argument("--force", action="store_true", help="Overwrite an existing config file")
+    install_parser.add_argument(
+        "--non-interactive",
+        action="store_true",
+        help="Do not prompt; require --scope, --provider and --token",
+    )
 
     feature_parser = subparsers.add_parser("feature", help="Feature branch workflows")
     feature_sub = feature_parser.add_subparsers(dest="feature_command")
@@ -95,10 +107,22 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "version":
             return _emit({"ok": True, "version": __version__}, args.as_json)
         if args.command == "config-check":
-            config = load_config(args.config_path)
+            config = load_config(args.config_path, repo_path=args.repo_path)
             payload = asdict(config) if is_dataclass(config) else config
+            payload = _mask_config_payload(payload)
             payload = {"ok": True, "config": payload}
             return _emit(payload, args.as_json)
+        if args.command == "install":
+            result = install_config(
+                repo_path=args.repo_path,
+                scope=args.scope,
+                provider=args.provider,
+                token=args.token,
+                url=args.url,
+                force=args.force,
+                interactive=not args.non_interactive,
+            )
+            return _emit(_to_payload(result), args.as_json)
         if args.command == "feature":
             ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
             if args.feature_command == "start":
@@ -177,6 +201,8 @@ def _emit(payload: dict, as_json: bool) -> int:
                 print(f"branch: {payload['branch']}")
             if payload.get("tag"):
                 print(f"tag: {payload['tag']}")
+            if payload.get("path"):
+                print(f"path: {payload['path']}")
             merge_request = payload.get("merge_request")
             if isinstance(merge_request, dict) and merge_request.get("url"):
                 print(f"merge_request: {merge_request['url']}")
@@ -199,6 +225,13 @@ def _to_payload(result) -> dict:
     if is_dataclass(result):
         return asdict(result)
     return result
+
+
+def _mask_config_payload(payload: dict) -> dict:
+    provider = payload.get("provider")
+    if isinstance(provider, dict) and provider.get("token"):
+        provider["token"] = "***MASKED***"
+    return payload
 
 
 def _emit_error(exc: Exception, as_json: bool) -> int:

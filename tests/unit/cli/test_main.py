@@ -1,5 +1,7 @@
 import json
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from gitflow_api.cli.main import main
@@ -90,3 +92,50 @@ class CliMainTests(unittest.TestCase):
         payload = json.loads(mock_print.call_args.args[0])
         self.assertEqual(payload["version"], "1.2.3")
         self.assertEqual(payload["items"][0]["title"], "Story A")
+
+    def test_config_check_masks_token_in_json_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path = Path(tmp) / "gitflow.toml"
+            config_path.write_text(
+                """
+[provider]
+type = "github"
+url = "https://github.com"
+token = "secret-token"
+""".strip(),
+                encoding="utf-8",
+            )
+
+            with patch("builtins.print") as mock_print:
+                exit_code = main(["--json", "--config", str(config_path), "config-check"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(mock_print.call_args.args[0])
+        self.assertEqual(payload["config"]["provider"]["token"], "***MASKED***")
+
+    def test_install_project_config_non_interactive_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("builtins.print") as mock_print:
+                exit_code = main([
+                    "--json",
+                    "--repo",
+                    tmp,
+                    "install",
+                    "--scope",
+                    "project",
+                    "--provider",
+                    "github",
+                    "--token",
+                    "secret-token",
+                    "--non-interactive",
+                ])
+
+            config_path = Path(tmp) / "gitflow.toml"
+            content = config_path.read_text(encoding="utf-8")
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(mock_print.call_args.args[0])
+        self.assertEqual(payload["scope"], "project")
+        self.assertEqual(payload["provider"], "github")
+        self.assertIn('token = "secret-token"', content)
+        self.assertIn('feature_label = "feature"', content)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import copy
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -24,9 +25,12 @@ from gitflow_api.config.validation import ensure_provider_supported, require_non
 from gitflow_api.domain.exceptions import ConfigError
 
 
-def load_config(config_path: str | os.PathLike[str] | None = None) -> AppConfig:
+def load_config(
+    config_path: str | os.PathLike[str] | None = None,
+    repo_path: str | os.PathLike[str] | None = None,
+) -> AppConfig:
     raw_config = copy.deepcopy(DEFAULT_CONFIG)
-    path = _resolve_config_path(config_path)
+    path = resolve_config_path(config_path, repo_path)
     if path is not None:
         file_config = _read_toml(path)
         _deep_merge(raw_config, file_config)
@@ -44,7 +48,7 @@ def load_config(config_path: str | os.PathLike[str] | None = None) -> AppConfig:
     provider = ProviderConfig(
         type=provider_type,
         url=require_non_empty(str(provider_section.get("url", "")), "provider.url"),
-        token=require_non_empty(token, f"provider.token or env:{token_env}"),
+        token=require_non_empty(token, f"provider.token or env:{_safe_token_env_label(token_env)}"),
     )
 
     branches = raw_config["branches"]
@@ -85,17 +89,44 @@ def load_config(config_path: str | os.PathLike[str] | None = None) -> AppConfig:
     )
 
 
-def _resolve_config_path(config_path: str | os.PathLike[str] | None) -> Path | None:
+def resolve_config_path(
+    config_path: str | os.PathLike[str] | None = None,
+    repo_path: str | os.PathLike[str] | None = None,
+) -> Path | None:
     if config_path is not None:
         path = Path(config_path)
         if not path.exists():
             raise ConfigError(f"Config file not found: {path}")
         return path
 
-    for candidate in (Path(".gitflow.toml"), Path("gitflow.toml")):
+    base_path = Path(repo_path or ".").resolve()
+    for candidate in _project_config_candidates(base_path):
+        if candidate.exists():
+            return candidate
+    for candidate in global_config_candidates():
         if candidate.exists():
             return candidate
     return None
+
+
+def _project_config_candidates(base_path: Path) -> tuple[Path, Path]:
+    return (base_path / "gitflow.toml", base_path / ".gitflow.toml")
+
+
+def default_global_config_path() -> Path:
+    xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
+    base_path = Path(xdg_config_home).expanduser() if xdg_config_home else Path.home() / ".config"
+    return base_path / "gitflow" / "gitflow.toml"
+
+
+def global_config_candidates() -> tuple[Path, ...]:
+    configured_path = os.environ.get("GITFLOW_CONFIG")
+    candidates: list[Path] = []
+    if configured_path:
+        candidates.append(Path(configured_path).expanduser())
+    candidates.append(default_global_config_path())
+    candidates.append(Path.home() / ".gitflow.toml")
+    return tuple(candidates)
 
 
 def _read_toml(path: Path) -> dict[str, Any]:
@@ -146,6 +177,12 @@ def _default_token_env(provider_type: str) -> str:
     if provider_type == "github":
         return "GITHUB_TOKEN"
     return "GITFLOW_GITLAB_TOKEN"
+
+
+def _safe_token_env_label(token_env: str) -> str:
+    if re.fullmatch(r"[A-Z_][A-Z0-9_]*", token_env):
+        return token_env
+    return "***MASKED***"
 
 
 def _deep_merge(base: dict[str, Any], incoming: dict[str, Any]) -> None:

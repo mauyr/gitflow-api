@@ -19,7 +19,7 @@ def build_context(
     provider_factory=None,
 ) -> AppContext:
     resolved_repo_path = str(Path(repo_path or ".").resolve())
-    config = load_config(config_path)
+    config = load_config(config_path, repo_path=resolved_repo_path)
 
     client = git_client or GitClient(resolved_repo_path)
 
