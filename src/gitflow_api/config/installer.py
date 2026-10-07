@@ -78,6 +78,7 @@ def render_config(*, provider: str, url: str, token: str) -> str:
             _section("merge_request", config["merge_request"]),
             _section("changelog", config["changelog"]),
             _section("behavior", config["behavior"]),
+            _section("launch", config["launch"]),
             "",
         ]
     )

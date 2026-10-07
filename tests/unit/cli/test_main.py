@@ -160,3 +160,4 @@ token = "secret-token"
         self.assertEqual(payload["provider"], "github")
         self.assertIn('token = "secret-token"', content)
         self.assertIn('feature_label = "feature"', content)
+        self.assertIn('release_name_template = "{project} {version}"', content)
