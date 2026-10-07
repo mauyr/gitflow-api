@@ -241,7 +241,7 @@ For a product whose DigitalOcean App bundles multiple repositories, run the
 component launches first and the deployment profile last. This prevents a deployment
 from using a component that has not yet received its release tag.
 
-The `examples/legallite.gitflow.toml` file is a safe starting point for the
+The `examples/legallite-deployment.toml` file is a safe starting point for the
 LegalLite App. It remains disabled until the BFF, frontend and user-guide share a
 release-tag convention.
 

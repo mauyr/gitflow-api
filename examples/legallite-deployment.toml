@@ -1,0 +1,21 @@
+# Copy these sections into gitflow.toml in each LegalLite repository.
+# They inherit the shared provider configuration from the global gitflow.toml.
+
+[launch]
+release_name_template = "v{version}"
+
+# The profile is intentionally disabled until every App source has a matching release
+# tag. DigitalOcean Apps deploys all sources in one operation, so deploying after only
+# the BFF or frontend tag could publish a mixed version.
+[[deploy.profiles]]
+name = "production"
+driver = "digitalocean-app"
+enabled = false
+app_id = "<digitalocean-app-id>"
+wait = true
+timeout_seconds = 1800
+components = [
+  { path = "/home/mauyr/projects/lite/bff", branch = "master", tag = "{version}" },
+  { path = "/home/mauyr/projects/lite/frontend", branch = "master", tag = "{version}" },
+  { path = "/home/mauyr/projects/lite/user-guide", branch = "main", tag = "{version}" },
+]
