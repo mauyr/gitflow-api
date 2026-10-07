@@ -30,4 +30,10 @@ DEFAULT_CONFIG: dict = {
         "require_clean_worktree": True,
         "auto_push": True,
     },
+    "launch": {
+        "release_name_template": "{project} {version}",
+    },
+    "deploy": {
+        "profiles": [],
+    },
 }

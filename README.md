@@ -41,6 +41,10 @@ The CLI resolves configuration in this order:
 3. Global config: `GITFLOW_CONFIG`, then `$XDG_CONFIG_HOME/gitflow/gitflow.toml`, then `~/.gitflow.toml`
 4. Built-in defaults
 
+Without `--config`, global configuration is loaded first and the project file is
+merged over it. This lets a project add a deploy profile without duplicating a
+shared provider credential configuration.
+
 Preferred project config file name:
 
 ```bash
@@ -172,6 +176,74 @@ Semantics:
 ```bash
 gitflow launch 1.2.3
 ```
+
+`launch` calculates the changelog before creating the tag, so the platform release
+receives the complete range of changes. Its title is configurable:
+
+```toml
+[launch]
+release_name_template = "v{version}"
+```
+
+Templates may use `{project}`, `{version}` and `{tag}`.
+
+### Deployments
+
+Deployments are explicit and profile-based. A normal `launch` never deploys by
+surprise. This keeps the core release flow reusable across projects while allowing
+each project to choose its own production mechanism.
+
+```bash
+gitflow deploy production --version 1.2.3 --dry-run
+gitflow deploy production --version 1.2.3
+gitflow launch 1.2.3 --deploy staging
+```
+
+Profiles live in TOML and must not contain credentials. The built-in `command`
+driver runs a trusted argument array without a shell:
+
+```toml
+[[deploy.profiles]]
+name = "production"
+driver = "command"
+command = ["./scripts/deploy-production.sh", "--version", "{version}"]
+working_directory = "."
+timeout_seconds = 1800
+```
+
+The command receives `{version}`, `{tag}`, `{repo_path}`, `{remote_url}` and
+`{release_url}` template variables. Additional deployment drivers can be installed
+as Python entry points in the `gitflow_api.deployment_extensions` group.
+
+The built-in `digitalocean-app` driver uses the locally authenticated `doctl`
+command. It requires every source that belongs to the release to be listed in
+`components`; before deployment, each configured release tag must resolve to the
+same commit as `origin/<branch>`.
+
+Set `enabled = false` while a profile is being prepared; the CLI will refuse to
+execute it until it is explicitly enabled.
+
+```toml
+[[deploy.profiles]]
+name = "legal-lite-production"
+driver = "digitalocean-app"
+app_id = "<digitalocean-app-id>"
+context = "production"
+wait = true
+timeout_seconds = 1800
+components = [
+  { path = "/workspace/lite/bff", branch = "master", tag = "{version}" },
+  { path = "/workspace/lite/frontend", branch = "master", tag = "{version}" },
+]
+```
+
+For a product whose DigitalOcean App bundles multiple repositories, run the
+component launches first and the deployment profile last. This prevents a deployment
+from using a component that has not yet received its release tag.
+
+The `examples/legallite.gitflow.toml` file is a safe starting point for the
+LegalLite App. It remains disabled until the BFF, frontend and user-guide share a
+release-tag convention.
 
 ### Changelog
 

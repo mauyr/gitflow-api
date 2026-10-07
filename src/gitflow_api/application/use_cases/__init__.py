@@ -1,4 +1,5 @@
 from .changelog import ChangelogInput, execute as execute_changelog
+from .deploy import DeployInput, execute as execute_deploy
 from .feature_finish import FeatureFinishInput, execute as execute_feature_finish
 from .feature_start import FeatureStartInput, execute as execute_feature_start
 from .hotfix_finish import HotfixFinishInput, execute as execute_hotfix_finish
@@ -9,6 +10,7 @@ from .release_start import ReleaseStartInput, execute as execute_release_start
 
 __all__ = [
     "ChangelogInput",
+    "DeployInput",
     "FeatureFinishInput",
     "FeatureStartInput",
     "HotfixFinishInput",
@@ -17,6 +19,7 @@ __all__ = [
     "ReleaseFinishInput",
     "ReleaseStartInput",
     "execute_changelog",
+    "execute_deploy",
     "execute_feature_finish",
     "execute_feature_start",
     "execute_hotfix_finish",

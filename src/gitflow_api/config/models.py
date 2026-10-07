@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -43,9 +44,28 @@ class BehaviorConfig:
 
 
 @dataclass(frozen=True)
+class LaunchConfig:
+    release_name_template: str
+
+
+@dataclass(frozen=True)
+class DeploymentProfileConfig:
+    name: str
+    driver: str
+    options: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class DeploymentConfig:
+    profiles: list[DeploymentProfileConfig] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class AppConfig:
     provider: ProviderConfig
     branches: BranchConfig
     merge_request: MergeRequestConfig
     changelog: ChangelogConfig
     behavior: BehaviorConfig
+    launch: LaunchConfig
+    deploy: DeploymentConfig

@@ -6,7 +6,16 @@ from gitflow_api.application.use_cases.feature_finish import FeatureFinishInput,
 from gitflow_api.application.use_cases.feature_start import FeatureStartInput, execute as execute_feature_start
 from gitflow_api.application.use_cases.hotfix_finish import HotfixFinishInput, execute as execute_hotfix_finish
 from gitflow_api.application.use_cases.hotfix_start import HotfixStartInput, execute as execute_hotfix_start
-from gitflow_api.config.models import AppConfig, BehaviorConfig, BranchConfig, ChangelogConfig, MergeRequestConfig, ProviderConfig
+from gitflow_api.config.models import (
+    AppConfig,
+    BehaviorConfig,
+    BranchConfig,
+    ChangelogConfig,
+    DeploymentConfig,
+    LaunchConfig,
+    MergeRequestConfig,
+    ProviderConfig,
+)
 from gitflow_api.domain.exceptions import BranchAlreadyExistsError, WorkingTreeNotCleanError
 from gitflow_api.domain.models import MergeRequestInfo
 
@@ -107,6 +116,8 @@ class UseCaseTests(unittest.TestCase):
                     ignore_labels=["ignore"],
                 ),
                 behavior=BehaviorConfig(require_clean_worktree=True, auto_push=True),
+                launch=LaunchConfig(release_name_template="{project} {version}"),
+                deploy=DeploymentConfig(),
             ),
             git=git or FakeGit(),
             provider=provider or FakeProvider(),

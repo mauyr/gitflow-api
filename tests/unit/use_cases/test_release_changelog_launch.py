@@ -5,7 +5,16 @@ from gitflow_api.application.use_cases.changelog import ChangelogInput, execute 
 from gitflow_api.application.use_cases.launch import LaunchInput, execute as execute_launch
 from gitflow_api.application.use_cases.release_finish import ReleaseFinishInput, execute as execute_release_finish
 from gitflow_api.application.use_cases.release_start import ReleaseStartInput, execute as execute_release_start
-from gitflow_api.config.models import AppConfig, BehaviorConfig, BranchConfig, ChangelogConfig, MergeRequestConfig, ProviderConfig
+from gitflow_api.config.models import (
+    AppConfig,
+    BehaviorConfig,
+    BranchConfig,
+    ChangelogConfig,
+    DeploymentConfig,
+    LaunchConfig,
+    MergeRequestConfig,
+    ProviderConfig,
+)
 from gitflow_api.domain.exceptions import ChangelogError, ReleaseFlowError
 from gitflow_api.domain.models import MergeRequestInfo
 
@@ -167,6 +176,8 @@ class ReleaseLaunchTests(unittest.TestCase):
                     ignore_labels=["ignore"],
                 ),
                 behavior=BehaviorConfig(require_clean_worktree=True, auto_push=True),
+                launch=LaunchConfig(release_name_template="v{version}"),
+                deploy=DeploymentConfig(),
             ),
             git=git or FakeGit(),
             provider=provider or FakeProvider(),
@@ -253,3 +264,5 @@ class ReleaseLaunchTests(unittest.TestCase):
         self.assertIn(("create_tag", "project-1.2.3", "1.2.3"), git.actions)
         self.assertIn(("push_tag", "project-1.2.3"), git.actions)
         self.assertEqual(provider.calls[-1][0], "create_release")
+        self.assertEqual(provider.calls[-1][1]["name"], "v1.2.3")
+        self.assertLess(git.actions.index(("log", "abc123..HEAD")), git.actions.index(("create_tag", "project-1.2.3", "1.2.3")))

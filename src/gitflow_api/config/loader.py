@@ -18,6 +18,9 @@ from gitflow_api.config.models import (
     BehaviorConfig,
     BranchConfig,
     ChangelogConfig,
+    DeploymentConfig,
+    DeploymentProfileConfig,
+    LaunchConfig,
     MergeRequestConfig,
     ProviderConfig,
 )
@@ -30,8 +33,7 @@ def load_config(
     repo_path: str | os.PathLike[str] | None = None,
 ) -> AppConfig:
     raw_config = copy.deepcopy(DEFAULT_CONFIG)
-    path = resolve_config_path(config_path, repo_path)
-    if path is not None:
+    for path in _resolve_config_paths(config_path, repo_path):
         file_config = _read_toml(path)
         _deep_merge(raw_config, file_config)
 
@@ -55,6 +57,8 @@ def load_config(
     merge_request = raw_config["merge_request"]
     changelog = raw_config["changelog"]
     behavior = raw_config["behavior"]
+    launch = raw_config["launch"]
+    deploy = raw_config["deploy"]
 
     return AppConfig(
         provider=provider,
@@ -86,7 +90,37 @@ def load_config(
             require_clean_worktree=bool(behavior.get("require_clean_worktree", True)),
             auto_push=bool(behavior.get("auto_push", True)),
         ),
+        launch=LaunchConfig(
+            release_name_template=require_non_empty(
+                str(launch.get("release_name_template", "")), "launch.release_name_template"
+            ),
+        ),
+        deploy=_load_deployment_config(deploy),
     )
+
+
+def _load_deployment_config(raw_deploy: Any) -> DeploymentConfig:
+    if not isinstance(raw_deploy, dict):
+        raise ConfigError("Invalid deploy configuration: expected a table")
+
+    raw_profiles = raw_deploy.get("profiles", [])
+    if not isinstance(raw_profiles, list):
+        raise ConfigError("Invalid deploy.profiles: expected an array")
+
+    profiles: list[DeploymentProfileConfig] = []
+    profile_names: set[str] = set()
+    for index, raw_profile in enumerate(raw_profiles, start=1):
+        if not isinstance(raw_profile, dict):
+            raise ConfigError(f"Invalid deploy.profiles[{index}]: expected a table")
+        name = require_non_empty(str(raw_profile.get("name", "")), f"deploy.profiles[{index}].name")
+        driver = require_non_empty(str(raw_profile.get("driver", "")), f"deploy.profiles[{index}].driver")
+        if name in profile_names:
+            raise ConfigError(f"Duplicate deployment profile: {name}")
+        profile_names.add(name)
+        options = {key: value for key, value in raw_profile.items() if key not in {"name", "driver"}}
+        profiles.append(DeploymentProfileConfig(name=name, driver=driver, options=options))
+
+    return DeploymentConfig(profiles=profiles)
 
 
 def resolve_config_path(
@@ -107,6 +141,30 @@ def resolve_config_path(
         if candidate.exists():
             return candidate
     return None
+
+
+def _resolve_config_paths(
+    config_path: str | os.PathLike[str] | None = None,
+    repo_path: str | os.PathLike[str] | None = None,
+) -> tuple[Path, ...]:
+    if config_path is not None:
+        path = Path(config_path)
+        if not path.exists():
+            raise ConfigError(f"Config file not found: {path}")
+        return (path,)
+
+    paths: list[Path] = []
+    global_path = _first_existing(global_config_candidates())
+    if global_path is not None:
+        paths.append(global_path)
+    project_path = _first_existing(_project_config_candidates(Path(repo_path or ".").resolve()))
+    if project_path is not None:
+        paths.append(project_path)
+    return tuple(paths)
+
+
+def _first_existing(candidates: tuple[Path, ...]) -> Path | None:
+    return next((candidate for candidate in candidates if candidate.exists()), None)
 
 
 def _project_config_candidates(base_path: Path) -> tuple[Path, Path]:

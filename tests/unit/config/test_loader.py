@@ -94,6 +94,49 @@ token = "project-secret"
         self.assertEqual(config.provider.type, "github")
         self.assertEqual(config.provider.token, "project-secret")
 
+    def test_project_config_can_add_deployment_profile_while_inheriting_global_provider(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            repo_path = root / "repo"
+            global_home = root / "xdg"
+            repo_path.mkdir()
+            global_config_path = global_home / "gitflow" / "gitflow.toml"
+            global_config_path.parent.mkdir(parents=True)
+            global_config_path.write_text(
+                """
+[provider]
+type = "github"
+url = "https://api.github.com"
+token = "global-secret"
+""".strip(),
+                encoding="utf-8",
+            )
+            (repo_path / "gitflow.toml").write_text(
+                """
+[launch]
+release_name_template = "v{version}"
+
+[[deploy.profiles]]
+name = "production"
+driver = "command"
+command = ["deploy"]
+""".strip(),
+                encoding="utf-8",
+            )
+            previous = os.environ.get("XDG_CONFIG_HOME")
+            os.environ["XDG_CONFIG_HOME"] = str(global_home)
+            try:
+                config = load_config(repo_path=repo_path)
+            finally:
+                if previous is None:
+                    os.environ.pop("XDG_CONFIG_HOME", None)
+                else:
+                    os.environ["XDG_CONFIG_HOME"] = previous
+
+        self.assertEqual(config.provider.token, "global-secret")
+        self.assertEqual(config.launch.release_name_template, "v{version}")
+        self.assertEqual(config.deploy.profiles[0].name, "production")
+
     def test_prefers_gitflow_toml_over_hidden_project_config(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo_path = Path(tmp)
@@ -186,3 +229,56 @@ token_env = "ghp-not-a-safe-env-name"
         message = str(ctx.exception)
         self.assertIn("env:***MASKED***", message)
         self.assertNotIn("ghp-not-a-safe-env-name", message)
+
+    def test_loads_launch_template_and_deployment_profiles(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path = Path(tmp) / "gitflow.toml"
+            config_path.write_text(
+                """
+[provider]
+type = "github"
+url = "https://api.github.com"
+token = "test-token"
+
+[launch]
+release_name_template = "v{version}"
+
+[[deploy.profiles]]
+name = "production"
+driver = "command"
+command = ["./scripts/deploy.sh", "{version}"]
+timeout_seconds = 900
+""".strip(),
+                encoding="utf-8",
+            )
+            config = load_config(config_path)
+
+        self.assertEqual(config.launch.release_name_template, "v{version}")
+        self.assertEqual(len(config.deploy.profiles), 1)
+        self.assertEqual(config.deploy.profiles[0].name, "production")
+        self.assertEqual(config.deploy.profiles[0].options["timeout_seconds"], 900)
+
+    def test_rejects_duplicate_deployment_profiles(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path = Path(tmp) / "gitflow.toml"
+            config_path.write_text(
+                """
+[provider]
+type = "github"
+url = "https://api.github.com"
+token = "test-token"
+
+[[deploy.profiles]]
+name = "production"
+driver = "command"
+command = ["true"]
+
+[[deploy.profiles]]
+name = "production"
+driver = "command"
+command = ["true"]
+""".strip(),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ConfigError, "Duplicate deployment profile"):
+                load_config(config_path)

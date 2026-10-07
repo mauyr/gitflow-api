@@ -8,6 +8,7 @@ from gitflow_api import __version__
 from gitflow_api.application.factories import build_context
 from gitflow_api.application.use_cases import (
     ChangelogInput,
+    DeployInput,
     FeatureFinishInput,
     FeatureStartInput,
     HotfixFinishInput,
@@ -16,6 +17,7 @@ from gitflow_api.application.use_cases import (
     ReleaseFinishInput,
     ReleaseStartInput,
     execute_changelog,
+    execute_deploy,
     execute_feature_finish,
     execute_feature_start,
     execute_hotfix_finish,
@@ -91,6 +93,19 @@ def build_parser() -> argparse.ArgumentParser:
     launch_parser = subparsers.add_parser("launch", help="Create tag and platform release")
     launch_parser.add_argument("version")
     launch_parser.add_argument("--ref")
+    launch_parser.add_argument(
+        "--deploy",
+        dest="deploy_profiles",
+        action="append",
+        default=[],
+        metavar="PROFILE",
+        help="Run a named deployment profile after the release is created. Can be repeated.",
+    )
+
+    deploy_parser = subparsers.add_parser("deploy", help="Run a configured deployment profile")
+    deploy_parser.add_argument("profile")
+    deploy_parser.add_argument("--version", required=True)
+    deploy_parser.add_argument("--dry-run", action="store_true")
 
     changelog_parser = subparsers.add_parser("changelog", help="Generate changelog")
     changelog_parser.add_argument("version")
@@ -178,7 +193,15 @@ def main(argv: list[str] | None = None) -> int:
                 return _emit(_to_payload(result), args.as_json)
         if args.command == "launch":
             ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
-            result = execute_launch(LaunchInput(version=args.version, ref=args.ref), ctx)
+            result = execute_launch(
+                LaunchInput(version=args.version, ref=args.ref, deploy_profiles=tuple(args.deploy_profiles)), ctx
+            )
+            return _emit(_to_payload(result), args.as_json)
+        if args.command == "deploy":
+            ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)
+            result = execute_deploy(
+                DeployInput(profile=args.profile, version=args.version, dry_run=args.dry_run), ctx
+            )
             return _emit(_to_payload(result), args.as_json)
         if args.command == "changelog":
             ctx = build_context(repo_path=args.repo_path, config_path=args.config_path)

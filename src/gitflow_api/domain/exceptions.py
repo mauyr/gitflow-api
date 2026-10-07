@@ -44,3 +44,7 @@ class ChangelogError(GitflowError):
 
 class ReleaseFlowError(GitflowError):
     """Raised when the configured repository cannot execute the requested release flow."""
+
+
+class DeploymentError(GitflowError):
+    """Raised when a configured deployment cannot be started or verified."""

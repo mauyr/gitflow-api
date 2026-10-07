@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from gitflow_api.cli.main import main
-from gitflow_api.domain.results import ChangelogResult, FeatureStartResult, LaunchResult, ReleaseStartResult
+from gitflow_api.domain.results import ChangelogResult, DeployResult, FeatureStartResult, LaunchResult, ReleaseStartResult
 
 
 class CliMainTests(unittest.TestCase):
@@ -92,6 +92,27 @@ class CliMainTests(unittest.TestCase):
         payload = json.loads(mock_print.call_args.args[0])
         self.assertEqual(payload["version"], "1.2.3")
         self.assertEqual(payload["items"][0]["title"], "Story A")
+
+    def test_deploy_json(self):
+        fake_result = DeployResult(
+            ok=True,
+            action="deploy",
+            message="done",
+            profile="production",
+            version="1.2.3",
+            tag="1.2.3",
+            deployments=[{"status": "planned"}],
+            dry_run=True,
+        )
+        with patch("gitflow_api.cli.main.build_context", return_value=object()), \
+             patch("gitflow_api.cli.main.execute_deploy", return_value=fake_result), \
+             patch("builtins.print") as mock_print:
+            exit_code = main(["--json", "deploy", "production", "--version", "1.2.3", "--dry-run"])
+
+        self.assertEqual(exit_code, 0)
+        payload = json.loads(mock_print.call_args.args[0])
+        self.assertEqual(payload["profile"], "production")
+        self.assertTrue(payload["dry_run"])
 
     def test_config_check_masks_token_in_json_output(self):
         with tempfile.TemporaryDirectory() as tmp:

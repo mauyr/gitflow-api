@@ -47,6 +47,16 @@ class LaunchResult(BaseResult):
     tag: str
     release: dict[str, Any] | None = None
     markdown: str = ""
+    deployments: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class DeployResult(BaseResult):
+    profile: str
+    version: str
+    tag: str
+    deployments: list[dict[str, Any]] = field(default_factory=list)
+    dry_run: bool = False
 
 
 @dataclass(frozen=True)

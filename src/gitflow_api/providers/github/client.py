@@ -45,7 +45,7 @@ class GitHubApiClient:
             "Accept": "application/vnd.github+json",
             "Authorization": f"Bearer {self.token}",
             "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "gitflow-api/0.4.0",
+            "User-Agent": "gitflow-api/0.5.0",
         }
         if payload is not None:
             body = json.dumps(payload).encode("utf-8")

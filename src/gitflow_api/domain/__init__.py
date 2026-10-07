@@ -2,6 +2,7 @@ from .exceptions import (
     BranchAlreadyExistsError,
     BranchNotFoundError,
     ChangelogError,
+    DeploymentError,
     ConfigError,
     GitflowError,
     MergeRequestNotFoundError,
@@ -13,7 +14,7 @@ from .exceptions import (
     WorkingTreeNotCleanError,
 )
 from .models import BranchNames, ChangelogItem, MergeRequestInfo, ReleaseNotes
-from .results import BaseResult, ChangelogResult, FeatureFinishResult, FeatureStartResult, LaunchResult, ReleaseFinishResult, ReleaseStartResult
+from .results import BaseResult, ChangelogResult, DeployResult, FeatureFinishResult, FeatureStartResult, LaunchResult, ReleaseFinishResult, ReleaseStartResult
 
 __all__ = [
     "BaseResult",
@@ -21,8 +22,10 @@ __all__ = [
     "BranchNames",
     "BranchNotFoundError",
     "ChangelogError",
+    "DeploymentError",
     "ChangelogItem",
     "ChangelogResult",
+    "DeployResult",
     "ConfigError",
     "FeatureFinishResult",
     "FeatureStartResult",
